@@ -178,7 +178,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
       <div class="relative">
         <div class="bg-gray-50 p-8 !rounded-xl border border-gray-100">
-          <div class="absolute -top-3 -left-3 w-10 h-10 flex items-center justify-center bg-primary text-white font-bold !rounded-full">
+          <div class="absolute -top-2 -left-2 w-10 h-10 flex items-center justify-center bg-primary text-white font-bold !rounded-full">
             1
           </div>
           
@@ -198,7 +198,7 @@
       
       <div class="relative">
         <div class="bg-gray-50 p-8 !rounded-xl border border-gray-100">
-          <div class="absolute -top-3 -left-3 w-10 h-10 flex items-center justify-center bg-primary text-white font-bold !rounded-full">
+          <div class="absolute -top-2 -left-2 w-10 h-10 flex items-center justify-center bg-primary text-white font-bold !rounded-full">
             2
           </div>
           
@@ -216,7 +216,7 @@
       
       <div class="relative">
         <div class="bg-gray-50 p-8 !rounded-xl border border-gray-100">
-          <div class="absolute -top-3 -left-3 w-10 h-10 flex items-center justify-center bg-primary text-white font-bold !rounded-full">
+          <div class="absolute -top-2 -left-2 w-10 h-10 flex items-center justify-center bg-primary text-white font-bold !rounded-full">
             3
           </div>
           
@@ -259,6 +259,7 @@
   </div>
 </section>
 
+<!-- Footer section -->
 <footer class="bg-secondary text-white py-12">
   <div class="container mx-auto px-6 text-center">
     <a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">Promptly</a>
@@ -267,44 +268,3 @@
     </p>
   </div>
 </footer>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-      // Mobile Menu Toggle
-      const mobileMenuButton = document.getElementById('mobileMenuButton');
-      const mobileMenu = document.getElementById('mobileMenu');
-      const menuIcon = document.getElementById('menuIcon');
-      const closeIcon = document.getElementById('closeIcon');
-
-      mobileMenuButton.addEventListener('click', function() {
-          // Toggle menu visibility
-          mobileMenu.classList.toggle('hidden');
-
-          // Toggle icons
-          menuIcon.classList.toggle('hidden');
-          closeIcon.classList.toggle('hidden');
-      });
-
-      // Smooth scrolling for anchor links
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-          anchor.addEventListener('click', function(e) {
-              e.preventDefault();
-              const targetId = this.getAttribute('href');
-              if (targetId === '#') return;
-              const targetElement = document.querySelector(targetId);
-              if (targetElement) {
-                  window.scrollTo({
-                      top: targetElement.offsetTop - 80, // Adjust for header height
-                      behavior: 'smooth'
-                  });
-                  // Close mobile menu if open and reset icons
-                  if (!mobileMenu.classList.contains('hidden')) {
-                      mobileMenu.classList.add('hidden');
-                      menuIcon.classList.remove('hidden');
-                      closeIcon.classList.add('hidden');
-                  }
-              }
-          });
-      });
-  });
-</script>
