@@ -22,7 +22,7 @@ config :promptly, PromptlyWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
   code_reloader: true,
-  debug_errors: true,
+  debug_errors: false,
   secret_key_base: "KsuUmxNFc4N2zacK51LisS3rLV3HXyR3DuCV5aGKngGPVAmzVHhuQpW/T9wsgQEb",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:promptly, ~w(--sourcemap=inline --watch)]},

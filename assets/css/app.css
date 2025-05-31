@@ -4,6 +4,8 @@
 
 /* This file is for your main application CSS */
 
+@import url("./pages/home.css");
+
 @import url("https://fonts.googleapis.com");
 @import url("https://fonts.gstatic.com");
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Pacifico&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap");
@@ -11,65 +13,4 @@
 body {
   font-family: "Inter", sans-serif;
   color: #1a202c;
-}
-
-.hero-gradient {
-  background: linear-gradient(
-    100deg,
-    rgba(255, 255, 255, 0.95) 50%,
-    rgba(255, 255, 255, 0.7) 100%
-  );
-}
-
-.cta-gradient {
-  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-.nav-link {
-  position: relative;
-}
-
-.nav-link::after {
-  content: "";
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: -4px;
-  left: 0;
-  background-color: #00a8e8;
-  transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-  width: 100%;
-}
-
-.sticky-header {
-  transition: box-shadow 0.3s ease;
-}
-
-input:focus {
-  outline: none;
-  border-color: #38b2ac;
-}
-
-@keyframes scroll {
-  0% {
-    transform: translateY(100%);
-  }
-  100% {
-    transform: translateY(-100%);
-  }
-}
-.animate-scroll {
-  animation: scroll 15s linear infinite;
-}
-
-.hero-gradient {
-  background: linear-gradient(135deg, #007ea7 0%, #007ea7 25%, #026438 100%);
 }
