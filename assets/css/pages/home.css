@@ -43,9 +43,75 @@ input:focus {
   border-color: #38b2ac;
 }
 
+.hero-gradient {
+  background: linear-gradient(135deg, #007ea7 0%, #007ea7 25%, #026438 100%);
+}
+
+.blur-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.blur-container::before,
+.blur-container::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 60px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.blur-container::before {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(113, 112, 112, 0.014) 0%,
+    rgba(113, 112, 112, 0.014) 20%,
+    rgba(113, 112, 112, 0.014) 60%,
+    transparent 100%
+  );
+
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.blur-container::after {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    rgba(113, 112, 112, 0.014) 0%,
+    rgba(113, 112, 112, 0.014) 20%,
+    rgba(113, 112, 112, 0.014) 60%,
+    transparent 100%
+  );
+
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.text-blur-gradient {
+  filter: blur(0px);
+  transition: filter 0.3s ease;
+}
+
+.scroll-container {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.scroll-content {
+  position: absolute;
+  width: 97%;
+  top: 0;
+  left: 0;
+}
+
 @keyframes scroll {
   0% {
-    transform: translateY(100%);
+    transform: translateY(170%);
   }
   100% {
     transform: translateY(-100%);
@@ -53,8 +119,4 @@ input:focus {
 }
 .animate-scroll {
   animation: scroll 15s linear infinite;
-}
-
-.hero-gradient {
-  background: linear-gradient(135deg, #007ea7 0%, #007ea7 25%, #026438 100%);
 }
