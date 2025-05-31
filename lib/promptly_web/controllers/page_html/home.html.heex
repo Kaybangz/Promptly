@@ -1,47 +1,11 @@
-<!-- Header -->
-<header class="sticky-header fixed top-0 left-0 w-full bg-white z-50 shadow-sm">
-  <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-    <!-- Logo -->
-    <a href="#" class="text-2xl font-['Pacifico'] text-secondary">Promptly</a>
-    <nav class="hidden md:flex items-center space-x-8">
-      <a href="#features" class="nav-link text-gray-700 hover:text-primary transition-colors">
-        Features
-      </a>
-      
-      <a href="#how-it-works" class="nav-link text-gray-700 hover:text-primary transition-colors">
-        How It Works
-      </a>
-      
-      <a
-        href="#"
-        class="ml-4 px-6 py-2 bg-primary text-white font-medium rounded-button whitespace-nowrap transition-all hover:bg-opacity-90"
-      >
-        Get Started
-      </a>
-    </nav>
-    
-<!-- Mobile Menu Button (toggles between hamburger and close icon) -->
-    <button class="md:hidden w-10 h-10 flex items-center justify-center" id="mobileMenuButton">
-      <div class="w-6 h-6 flex items-center justify-center">
-        <i class="ri-menu-3-line text-black text-2xl" id="menuIcon"></i>
-        <i class="ri-close-large-line text-black text-2xl hidden" id="closeIcon"></i>
-      </div>
-    </button>
-  </div>
-  
-<!-- Mobile Navigation Menu (Hidden by default) -->
-  <div class="md:hidden hidden bg-white border-t border-gray-200 py-2" id="mobileMenu">
-    <div class="container mx-auto px-6 py-4 sm:px-6 lg:px-8">
-      <nav class="flex flex-col space-y-3 py-3">
-        <a href="#features" class="text-gray-700 hover:text-primary font-medium py-2">Features</a>
-        <a href="#how-it-works" class="text-gray-700 hover:text-primary font-medium py-2">
-          How It Works
-        </a>
-         <a href="#" class="text-primary hover:text-primary-dark font-medium py-2">Get Started</a>
-      </nav>
-    </div>
-  </div>
-</header>
+<Header.component
+  logo={%{text: "Promptly", href: "/"}}
+  navigation={[
+    %{text: "Features", href: "#features"},
+    %{text: "How It Works", href: "#how-it-works"}
+  ]}
+  cta={%{text: "Get Started", route: "/app"}}
+/>
 
 <!-- Hero section -->
 <section class="relative min-h-screen pt-24 overflow-hidden hero-gradient  md:pt-10">
@@ -61,15 +25,15 @@
         
         <div class="flex flex-col justify-center mb-5 sm:flex-row md:justify-start md:mb-0 gap-4">
           <a
-            href="#"
-            class="px-8 py-3 bg-primary text-white font-medium text-center !rounded-button whitespace-nowrap transition-all hover:bg-opacity-75"
+            href="/app"
+            class="p-3 bg-primary text-white font-medium text-center !rounded-button whitespace-nowrap transition-all hover:bg-opacity-75"
           >
             Start Presenting
           </a>
           
           <a
             href="#"
-            class="px-8 py-3 border border-gray-300 text-white font-medium text-center !rounded-button whitespace-nowrap transition-all hover:bg-gray-50 hover:text-secondary"
+            class="p-3 border border-gray-300 text-white font-medium text-center !rounded-button whitespace-nowrap transition-all hover:bg-gray-50 hover:text-secondary"
           >
             Watch Demo
           </a>
@@ -338,8 +302,8 @@
     
     <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
       <a
-        href="#"
-        class="px-8 py-3 bg-primary text-white font-medium !rounded-button whitespace-nowrap transition-all hover:bg-opacity-75"
+        href="/app"
+        class="p-3 bg-primary text-white font-medium !rounded-button whitespace-nowrap transition-all hover:bg-opacity-75"
       >
         Try Promptly Free
       </a>

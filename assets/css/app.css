@@ -5,6 +5,7 @@
 /* This file is for your main application CSS */
 
 @import url("./pages/home.css");
+@import url("./pages/main.css");
 
 @import url("https://fonts.googleapis.com");
 @import url("https://fonts.gstatic.com");
@@ -13,4 +14,8 @@
 body {
   font-family: "Inter", sans-serif;
   color: #1a202c;
+}
+
+pre {
+  font-family: "Inter", sans-serif;
 }

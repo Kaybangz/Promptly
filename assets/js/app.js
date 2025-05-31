@@ -18,6 +18,7 @@
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html";
 import "./pages/home";
+
 // Establish Phoenix Socket and LiveView configuration.
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
@@ -26,6 +27,27 @@ import topbar from "../vendor/topbar";
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
+
+let Hooks = {};
+
+Hooks.MaintainFocus = {
+  mounted() {
+    this.el.addEventListener("focus", () => {
+      this.focused = true;
+    });
+    this.el.addEventListener("blur", () => {
+      this.focused = false;
+    });
+  },
+  updated() {
+    if (this.focused && document.activeElement !== this.el) {
+      this.el.focus();
+    }
+  },
+};
+
+export default Hooks;
+
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
