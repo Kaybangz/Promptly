@@ -1,0 +1,49 @@
+<Header.component logo={%{text: "Promptly", href: "/"}} navigation={[%{text: "Home", href: "/"}]} />
+<main class="py-8 w-full">
+  <div>
+    <!-- Progress Header -->
+    <section class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <div class="text-sm text-gray-600">
+          Step {@current_step} of {@total_steps}
+        </div>
+        <!-- Step Navigation -->
+        <div class="flex space-x-2">
+          <button
+            :for={step <- 1..@total_steps}
+            phx-click="go_to_step"
+            phx-value-step={step}
+            class={[
+              "h-10 w-10 rounded-full bg-gray-100",
+              "px-3 py-1 rounded-full text-sm font-medium transition-colors"
+            ]}
+          >
+            {step}
+          </button>
+        </div>
+      </div>
+    </section>
+    
+<!-- Step Content -->
+    <section>
+      <%= case @current_step do %>
+        <% 1 -> %>
+          <Script.component {assigns} />
+        <% 2 -> %>
+          <div class="text-center py-12">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Settings Configuration</h2>
+            
+            <p class="text-gray-600">This step will be implemented next...</p>
+          </div>
+        <% 3 -> %>
+          <div class="text-center py-12">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">
+              Teleprompter View
+            </h2>
+            
+            <p class="text-gray-600">This step will be implemented next...</p>
+          </div>
+      <% end %>
+    </section>
+  </div>
+</main>
