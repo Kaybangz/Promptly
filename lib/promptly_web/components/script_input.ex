@@ -1,4 +1,4 @@
-defmodule PromptlyWeb.Script do
+defmodule PromptlyWeb.Components.ScriptInput do
   use Phoenix.Component
 
   import PromptlyWeb.CoreComponents
@@ -16,14 +16,9 @@ defmodule PromptlyWeb.Script do
 
   attr :uploads, :map, required: false
 
-  def component(assigns) do
+  def element(assigns) do
     ~H"""
     <div>
-      <div>
-        <h2 class="text-xl font-semibold text-gray-900 mb-6 border-b pb-2">
-          Create new script
-        </h2>
-      </div>
       <.input_toggle mode={@add_script_mode} />
       <.textarea_form
         script={@script}
@@ -218,6 +213,7 @@ defmodule PromptlyWeb.Script do
     <div class="mt-8 flex justify-end">
       <.button
         phx-click="next_step"
+        disabled={can_proceed?(assigns) == false}
         class={
           if can_proceed?(assigns),
             do: "bg-primary p-2 text-white !rounded-button",
@@ -231,8 +227,6 @@ defmodule PromptlyWeb.Script do
   end
 
   defp can_proceed?(assigns) do
-    (valid_script?(assigns.script_word_count) && valid_character_count?(assigns.script)) ||
-      (valid_script?(count_words(assigns.uploaded_script)) &&
-         valid_character_count?(assigns.uploaded_script))
+    assigns.uploaded_script != "" || assigns.script != ""
   end
 end
