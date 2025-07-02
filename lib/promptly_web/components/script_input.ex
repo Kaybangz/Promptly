@@ -8,12 +8,11 @@ defmodule PromptlyWeb.Components.ScriptInput do
   @doc """
   Renders a complete script input form with toggle, text area, file upload, and proceed button.
   """
-  attr :add_script_mode, :atom, required: false, values: [:default, :import]
-  attr :script, :string, required: false
-  attr :script_word_count, :integer, required: false
-  attr :uploaded_script, :string, required: false
+  attr :add_script_mode, :atom
+  attr :script, :string, default: ""
+  attr :uploaded_script, :string, default: ""
+  attr :script_word_count, :integer
   attr :script_upload_error, :string, default: nil
-
   attr :uploads, :map, required: false
 
   def element(assigns) do
@@ -45,10 +44,16 @@ defmodule PromptlyWeb.Components.ScriptInput do
     <div class={"toggle-container mode-#{@mode}"}>
       <div class="toggle-slider"></div>
       <div class="toggle-buttons">
-        <.button class="toggle-btn" phx-click="default_add_mode">
+        <.button
+          class={"toggle-btn #{@mode == :default && "active"}"}
+          phx-click="default_add_mode"
+        >
           Text Area
         </.button>
-        <.button class="toggle-btn" phx-click="import_add_mode">
+        <.button
+          class={"toggle-btn #{@mode == :import && "active"}"}
+          phx-click="import_add_mode"
+        >
           File Import
         </.button>
       </div>
