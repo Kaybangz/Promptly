@@ -67,6 +67,9 @@ defmodule PromptlyWeb do
       use Phoenix.LiveComponent
 
       unquote(html_helpers())
+
+      def ok(socket), do: {:ok, socket}
+      def noreply(socket), do: {:noreply, socket}
     end
   end
 
