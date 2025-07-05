@@ -5,7 +5,7 @@ defmodule PromptlyWeb.PageHTML do
   See the `page_html` directory for all templates available.
   """
   use PromptlyWeb, :html
-  alias PromptlyWeb.Header
+  alias PromptlyWeb.Components.Header
 
   embed_templates "page_html/*"
 end

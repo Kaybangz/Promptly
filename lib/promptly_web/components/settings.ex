@@ -1,11 +1,11 @@
 defmodule PromptlyWeb.Components.Settings do
+  @moduledoc """
+  Renders the complete settings configuration form with live preview.
+  """
   use Phoenix.Component
 
   import PromptlyWeb.CoreComponents
 
-  @doc """
-  Renders the complete settings configuration form with live preview.
-  """
   attr :script, :string, required: true
   attr :uploaded_script, :string, required: true
   attr :settings, :map, required: true
