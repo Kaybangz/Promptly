@@ -31,6 +31,7 @@ defmodule PromptlyWeb.Components.Settings do
           <.font_family_selection {assigns} />
           <.speed_selection {assigns} />
           <.font_size_selection {assigns} />
+          <.countdown_timer_selection {assigns} />
           <.theme_selection {assigns} />
           <.mirror_mode_selection {assigns} />
           <.reset_button />
@@ -152,8 +153,8 @@ defmodule PromptlyWeb.Components.Settings do
         class="bg-white border border-gray-300 text-gray-900 hover:bg-gray-50 focus:ring-2 focus:ring-primary focus:outline-none font-medium rounded-button text-sm px-4 py-2.5 text-center inline-flex items-center justify-between w-full"
         type="button"
       >
-        <span style={"font-family: #{@settings.font_family.family};"}>
-          {@settings.font_family.name}
+        <span style={"font-family: #{@settings.font_family.css};"}>
+          {@settings.font_family.display_name}
         </span>
         <%= if @settings.font_family.dropdown_open do %>
           <svg
@@ -188,22 +189,22 @@ defmodule PromptlyWeb.Components.Settings do
         if(@settings.font_family.dropdown_open, do: "block", else: "hidden")
       ]}>
         <ul class="py-2 text-sm text-gray-700" role="menu">
-          <li :for={{name, family} <- font_families()} role="none">
+          <li :for={{display_name, css} <- font_families()} role="none">
             <button
               phx-click="update_font_family"
-              phx-value-family={family}
-              phx-value-name={name}
+              phx-value-css={css}
+              phx-value-display_name={display_name}
               class={[
                 "block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150",
-                if(@settings.font_family.family == family,
+                if(@settings.font_family.css == css,
                   do: "bg-blue-50 text-primary font-medium",
                   else: "text-gray-700"
                 )
               ]}
-              style={"font-family: #{family};"}
+              style={"font-family: #{css};"}
               role="menuitem"
             >
-              {name}
+              {display_name}
             </button>
           </li>
         </ul>
@@ -263,6 +264,44 @@ defmodule PromptlyWeb.Components.Settings do
     """
   end
 
+  defp countdown_timer_selection(assigns) do
+    ~H"""
+    <div class="setting-group">
+      <h4 class="text-sm font-bold text-gray-700 mb-2">Countdown Timer</h4>
+      <div class="flex items-center space-x-2">
+        <button
+          type="button"
+          phx-click="update_countdown_timer"
+          phx-value-action="decrement"
+          class="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-button transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+          </svg>
+        </button>
+        <div class="flex items-center justify-center min-w-16 px-3 py-2 bg-gray-50 border border-gray-300 rounded-button">
+          <span class="text-sm font-medium text-gray-900">
+            {@settings.countdown_timer}
+          </span>
+          <span class="text-xs text-gray-500 ml-1">
+            {if @settings.countdown_timer == 1, do: "sec", else: "secs"}
+          </span>
+        </div>
+        <button
+          type="button"
+          phx-click="update_countdown_timer"
+          phx-value-action="increment"
+          class="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-button transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    """
+  end
+
   defp live_preview(assigns) do
     ~H"""
     <div class={preview_container_class(@settings)}>
@@ -273,12 +312,11 @@ defmodule PromptlyWeb.Components.Settings do
       </div>
       <div
         :if={@settings.mode == :voice_controlled}
-        class="absolute bottom-2 left-2 bg-green-400 bg-opacity-40 text-white text-xs px-2 py-1 rounded-button"
+        class="absolute bottom-2 left-2 bg-green-400 bg-opacity-80 text-white text-xs px-2 py-1 rounded-button"
       >
         🎤 Voice Controlled Mode - Speed Control Disabled
       </div>
     </div>
-
     <style>
       @keyframes scroll-vertical-<%= @settings.preview_scroll_key %> {
         0% { transform: translateY(24rem); }
@@ -337,10 +375,14 @@ defmodule PromptlyWeb.Components.Settings do
     "relative overflow-hidden h-96 border rounded-button bg-black text-white"
   end
 
-  defp scroll_animation(%{mode: :manual, preview_scroll_key: key, speed: speed, font_size: font_size}, script) do
+  defp scroll_animation(
+         %{mode: :manual, preview_scroll_key: key, speed: speed, font_size: font_size},
+         script
+       ) do
     chars_per_line = max(1, trunc(400 / (font_size * 0.6)))
     total_lines = max(1, trunc(String.length(script) / chars_per_line))
-    content_height_px = total_lines * font_size * 1.5 # line-height is 1.5
+
+    content_height_px = total_lines * font_size * 1.5
 
     total_distance = 384 + content_height_px
 
@@ -352,10 +394,10 @@ defmodule PromptlyWeb.Components.Settings do
 
   defp scroll_animation(_, _), do: ""
 
-  defp preview_text_style(%{font_size: size, font_family: %{family: family}}) do
+  defp preview_text_style(%{font_size: size, font_family: %{css: css}}) do
     """
     font-size: #{size}px;
-    font-family: #{family};
+    font-family: #{css};
     line-height: 1.5;
     """
   end
