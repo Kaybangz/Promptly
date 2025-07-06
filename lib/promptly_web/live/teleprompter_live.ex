@@ -15,12 +15,13 @@ defmodule PromptlyWeb.TeleprompterLive do
     speed: 1.0,
     font_size: 36,
     font_family: %{
-      family: "Arial, sans-serif",
-      name: "Arial",
+      css: "Arial, sans-serif",
+      display_name: "Arial",
       dropdown_open: false
     },
     theme: :light,
     mirror_mode: false,
+    countdown_timer: 3,
     preview_scroll_key: :os.system_time(:millisecond)
   }
 
@@ -81,7 +82,8 @@ defmodule PromptlyWeb.TeleprompterLive do
   @impl true
   def handle_event("validate", _params, socket) do
     upload_error =
-      if String.length(String.trim(socket.assigns.script)) > 0 && socket.assigns.uploads.file.entries != [] do
+      if String.length(String.trim(socket.assigns.script)) > 0 &&
+           socket.assigns.uploads.file.entries != [] do
         "Please clear the text area before uploading a file. You cannot have both text area content and an uploaded file."
       else
         nil
@@ -199,8 +201,8 @@ defmodule PromptlyWeb.TeleprompterLive do
   end
 
   @impl true
-  def handle_event("update_font_family", %{"family" => family, "name" => name}, socket) do
-    font_family = %{family: family, name: name, dropdown_open: false}
+  def handle_event("update_font_family", %{"css" => css, "display_name" => display_name}, socket) do
+    font_family = %{css: css, display_name: display_name, dropdown_open: false}
     updated_settings = %{socket.assigns.settings | font_family: font_family}
 
     socket
@@ -250,6 +252,28 @@ defmodule PromptlyWeb.TeleprompterLive do
     socket
     |> assign(settings: updated_settings)
     |> restart_animation()
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("update_countdown_timer", %{"action" => "increment"}, socket) do
+    current_value = socket.assigns.settings.countdown_timer
+    new_value = min(current_value + 1, 60)
+    updated_settings = %{socket.assigns.settings | countdown_timer: new_value}
+
+    socket
+    |> assign(settings: updated_settings)
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("update_countdown_timer", %{"action" => "decrement"}, socket) do
+    current_value = socket.assigns.settings.countdown_timer
+    new_value = max(current_value - 1, 0)
+    updated_settings = %{socket.assigns.settings | countdown_timer: new_value}
+
+    socket
+    |> assign(settings: updated_settings)
     |> noreply()
   end
 
