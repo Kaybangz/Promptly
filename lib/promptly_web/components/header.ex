@@ -1,22 +1,27 @@
-defmodule PromptlyWeb.Header do
-  use Phoenix.Component
-
-  @doc """
+defmodule PromptlyWeb.Components.Header do
+  @moduledoc """
   Renders a header component.
   """
+
+  use Phoenix.Component
+
   attr :logo, :map, required: true
-  attr :navigation, :list, required: true
+  attr :navigation, :list, default: nil
   attr :cta, :map, default: nil
 
-  def component(assigns) do
+  def element(assigns) do
     ~H"""
     <header class="fixed top-0 left-0 w-full bg-white z-50 shadow-sm">
-      <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="mx-auto px-4 py-4 flex items-center justify-between">
         <.brand_logo logo={@logo} />
-        <.desktop_navigation navigation={@navigation} cta={@cta} />
-        <.mobile_menu_toggle />
+        <.desktop_navigation
+          :if={@navigation}
+          navigation={@navigation}
+          cta={@cta}
+        />
+        <.mobile_menu_toggle :if={@navigation && length(@navigation) > 1} />
       </div>
-      <.mobile_navigation navigation={@navigation} cta={@cta} />
+      <.mobile_navigation :if={@navigation && length(@navigation) > 1} navigation={@navigation} cta={@cta} />
     </header>
     """
   end
@@ -29,7 +34,10 @@ defmodule PromptlyWeb.Header do
 
   defp desktop_navigation(assigns) do
     ~H"""
-    <nav class="hidden md:flex items-center space-x-8">
+    <nav class={[
+      "md:flex items-center space-x-8",
+      @navigation && length(@navigation) > 1 && "hidden"
+    ]}>
       <.navigation_link
         :for={link <- @navigation}
         class="nav-link text-gray-700 hover:text-primary transition-colors"

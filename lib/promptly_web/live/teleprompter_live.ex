@@ -1,6 +1,7 @@
 defmodule PromptlyWeb.TeleprompterLive do
   use PromptlyWeb, :live_view
 
+  alias PromptlyWeb.Components.Header
   alias PromptlyWeb.Components.ScriptInput
   alias PromptlyWeb.Components.Settings
 
@@ -29,7 +30,8 @@ defmodule PromptlyWeb.TeleprompterLive do
     |> assign(
       script: "",
       uploaded_script: "",
-      script_upload_error: nil,
+      upload_error: nil,
+      upload_processing: false,
       add_script_mode: :default,
       script_word_count: 0,
       current_step: 1,
@@ -38,7 +40,7 @@ defmodule PromptlyWeb.TeleprompterLive do
     )
     |> allow_upload(
       :file,
-      accept: ~w(.txt .pdf .docx .doc),
+      accept: ~w(.txt .pdf .docx),
       max_entries: 1,
       max_file_size: 10_000_000
     )
@@ -55,7 +57,7 @@ defmodule PromptlyWeb.TeleprompterLive do
     socket
     |> assign(add_script_mode: :default)
     |> assign(uploaded_script: "")
-    |> assign(script_upload_error: nil)
+    |> assign(upload_error: nil)
     |> noreply()
   end
 
@@ -78,53 +80,60 @@ defmodule PromptlyWeb.TeleprompterLive do
 
   @impl true
   def handle_event("validate", _params, socket) do
-    noreply(socket)
+    upload_error =
+      if String.length(String.trim(socket.assigns.script)) > 0 && socket.assigns.uploads.file.entries != [] do
+        "Please clear the text area before uploading a file. You cannot have both text area content and an uploaded file."
+      else
+        nil
+      end
+
+    socket
+    |> assign(upload_error: upload_error)
+    |> noreply()
   end
 
   @impl true
   def handle_event("read_file", _params, socket) do
-    if socket.assigns.script != "" && socket.assigns.script_word_count > 0 do
+    socket =
       socket
-      |> assign(
-        script_upload_error:
-          "Please clear the text area before uploading a file. You cannot have both text area content and an uploaded file."
-      )
-      |> noreply()
-    else
-      socket = assign(socket, script_upload_error: nil)
+      |> assign(upload_error: nil)
+      |> assign(upload_processing: true)
+      |> assign(uploaded_script: "")
 
-      uploaded_files =
-        consume_uploaded_entries(socket, :file, fn %{path: path}, _ ->
-          case File.read(path) do
-            {:ok, content} -> content
-            {:error, reason} -> {:error, reason}
-          end
-        end)
+    uploaded_files =
+      consume_uploaded_entries(socket, :file, fn %{path: path}, entry ->
+        dest =
+          Path.join(System.tmp_dir(), "#{entry.uuid}.#{get_file_extension(entry.client_name)}")
 
-      case uploaded_files do
-        [content] when is_binary(content) ->
-          processed_content = process_content(content)
+        File.cp!(path, dest)
+        {:ok, %{path: dest, name: entry.client_name, type: get_file_type(entry.client_name)}}
+      end)
 
-          socket
-          |> assign(uploaded_script: processed_content)
-          |> assign(script_upload_error: nil)
-          |> noreply()
+    case uploaded_files do
+      [file] ->
+        case extract_text_from_file(file) do
+          {:ok, text} ->
+            File.rm(file.path)
 
-        [{:error, reason}] ->
-          socket
-          |> assign(script_upload_error: "Failed to read file: #{reason}")
-          |> noreply()
+            socket
+            |> assign(uploaded_script: text)
+            |> assign(upload_processing: false)
+            |> noreply()
 
-        [] ->
-          socket
-          |> assign(script_upload_error: "No file uploaded - please select a file first")
-          |> noreply()
+          {:error, reason} ->
+            File.rm(file.path)
 
-        _ ->
-          socket
-          |> assign(script_upload_error: "Unexpected error processing file")
-          |> noreply()
-      end
+            socket
+            |> assign(upload_error: "Error processing text: #{reason}")
+            |> assign(upload_processing: false)
+            |> noreply()
+        end
+
+      [] ->
+        socket
+        |> assign(upload_error: "No file uploaded.")
+        |> assign(processing: false)
+        |> noreply()
     end
   end
 
@@ -132,6 +141,7 @@ defmodule PromptlyWeb.TeleprompterLive do
   def handle_event("clear_file", _params, socket) do
     socket
     |> assign(uploaded_script: "")
+    |> assign(upload_error: nil)
     |> noreply()
   end
 
@@ -232,7 +242,10 @@ defmodule PromptlyWeb.TeleprompterLive do
   end
 
   def handle_event("update_mirror_mode", _params, socket) do
-    updated_settings = %{socket.assigns.settings | mirror_mode: !socket.assigns.settings.mirror_mode}
+    updated_settings = %{
+      socket.assigns.settings
+      | mirror_mode: !socket.assigns.settings.mirror_mode
+    }
 
     socket
     |> assign(settings: updated_settings)
@@ -250,6 +263,9 @@ defmodule PromptlyWeb.TeleprompterLive do
 
   defp restart_animation(socket) do
     socket
-    |> assign(:settings, %{socket.assigns.settings | preview_scroll_key: :os.system_time(:millisecond)})
+    |> assign(:settings, %{
+      socket.assigns.settings
+      | preview_scroll_key: :os.system_time(:millisecond)
+    })
   end
 end
