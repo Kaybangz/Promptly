@@ -1,0 +1,116 @@
+@import "../../node_modules/trix/dist/trix.css";
+
+@layer base {
+  trix-editor {
+    @apply h-[300px] min-h-[200px] overflow-y-scroll;
+  }
+
+  trix-editor > ul {
+    @apply list-disc;
+  }
+
+  trix-editor > ol {
+    @apply list-decimal;
+  }
+
+  trix-editor > ol,
+  trix-editor > ul {
+    @apply ml-4;
+  }
+
+  trix-editor > div > a {
+    @apply text-blue-700 underline decoration-blue-700 italic;
+  }
+}
+
+.trix-content {
+  line-height: 1.6;
+}
+
+.trix-content h1 {
+  font-weight: 900;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.trix-content blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.375rem;
+}
+
+.trix-content code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  color: #dc2626;
+}
+
+.trix-content pre {
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.trix-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.trix-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.trix-content li {
+  margin-bottom: 0.5rem;
+}
+
+.trix-content ul ul,
+.trix-content ol ol,
+.trix-content ul ol,
+.trix-content ol ul {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.trix-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.trix-content a:hover {
+  color: #1d4ed8;
+}
+
+.trix-content p {
+  margin-bottom: 1rem;
+}
+
+.trix-content strong {
+  font-weight: 700;
+}
+
+.trix-content em {
+  font-style: italic;
+}
+
+.trix-content del {
+  text-decoration: line-through;
+}
+
+.trix-button-group--file-tools {
+  display: none !important;
+}
+
+.trix-button--icon-attach {
+  display: none !important;
+}

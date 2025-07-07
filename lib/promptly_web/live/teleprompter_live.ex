@@ -29,12 +29,13 @@ defmodule PromptlyWeb.TeleprompterLive do
   def mount(_params, _session, socket) do
     socket
     |> assign(
+      script_mode: :default,
       script: "",
+      script_form: to_form(%{}, as: :editor),
       uploaded_script: "",
       upload_error: nil,
       upload_processing: false,
-      add_script_mode: :default,
-      script_word_count: 0,
+      word_count: 0,
       current_step: 1,
       total_steps: @total_steps,
       settings: @default_settings
@@ -49,33 +50,32 @@ defmodule PromptlyWeb.TeleprompterLive do
   end
 
   @impl true
-  def handle_event("default_add_mode", _params, socket) do
+  def handle_event("toggle_add_mode", %{"mode" => mode}, socket) do
+    new_mode = String.to_existing_atom(mode)
+
     socket =
-      Enum.reduce(socket.assigns.uploads.file.entries, socket, fn entry, acc ->
-        cancel_upload(acc, :file, entry.ref)
-      end)
+      if new_mode == :default do
+        Enum.reduce(socket.assigns.uploads.file.entries, socket, fn entry, acc ->
+          cancel_upload(acc, :file, entry.ref)
+        end)
+        |> assign(uploaded_script: "")
+        |> assign(upload_error: nil)
+      else
+        socket
+      end
 
     socket
-    |> assign(add_script_mode: :default)
-    |> assign(uploaded_script: "")
-    |> assign(upload_error: nil)
+    |> assign(script_mode: new_mode)
     |> noreply()
   end
 
   @impl true
-  def handle_event("import_add_mode", _params, socket) do
-    socket
-    |> assign(add_script_mode: :import)
-    |> noreply()
-  end
-
-  @impl true
-  def handle_event("update_script", %{"script" => script}, socket) do
-    word_count = count_words(script)
+  def handle_event("update_script", %{"editor" => %{"content" => content}}, socket) do
+    word_count = count_words(content)
 
     socket
-    |> assign(script: script)
-    |> assign(script_word_count: word_count)
+    |> assign(script: content)
+    |> assign(word_count: word_count)
     |> noreply()
   end
 
@@ -84,7 +84,7 @@ defmodule PromptlyWeb.TeleprompterLive do
     upload_error =
       if String.length(String.trim(socket.assigns.script)) > 0 &&
            socket.assigns.uploads.file.entries != [] do
-        "Please clear the text area before uploading a file. You cannot have both text area content and an uploaded file."
+        "Please clear the text editor before uploading a file."
       else
         nil
       end

@@ -8,10 +8,11 @@ defmodule PromptlyWeb.Components.ScriptInput do
   import Promptly.ScriptUtils.ScriptValidation
   import Promptly.ScriptUtils.FileProcessing
 
-  attr :add_script_mode, :atom
+  attr :script_mode, :atom
   attr :script, :string, default: ""
+  attr :script_form, :map, default: %{}
   attr :uploaded_script, :string, default: ""
-  attr :script_word_count, :integer
+  attr :word_count, :integer
   attr :upload_error, :string, default: nil
   attr :upload_processing, :boolean
   attr :uploads, :map
@@ -19,11 +20,12 @@ defmodule PromptlyWeb.Components.ScriptInput do
   def element(assigns) do
     ~H"""
     <div>
-      <.input_toggle mode={@add_script_mode} />
-      <.textarea_form
+      <.input_toggle mode={@script_mode} />
+      <.text_editor
+        script_form={@script_form}
         script={@script}
-        word_count={@script_word_count}
-        visible={@add_script_mode == :default}
+        word_count={@word_count}
+        visible={@script_mode == :default}
       />
       <.file_upload_form
         uploads={@uploads}
@@ -31,11 +33,11 @@ defmodule PromptlyWeb.Components.ScriptInput do
         uploaded_script={@uploaded_script}
         upload_error={@upload_error}
         upload_processing={@upload_processing}
-        visible={@add_script_mode == :import}
+        visible={@script_mode == :import}
       />
       <.proceed_button
         script={@script}
-        script_word_count={@script_word_count}
+        word_count={@word_count}
         uploaded_script={@uploaded_script}
       />
     </div>
@@ -47,10 +49,18 @@ defmodule PromptlyWeb.Components.ScriptInput do
     <div class={"toggle-container mode-#{@mode}"}>
       <div class="toggle-slider"></div>
       <div class="toggle-buttons">
-        <.button class={"toggle-btn #{@mode == :default && "active"}"} phx-click="default_add_mode">
-          Text Area
+        <.button
+          class={"toggle-btn #{@mode == :default && "active"}"}
+          phx-click="toggle_add_mode"
+          phx-value-mode="default"
+        >
+          Text Editor
         </.button>
-        <.button class={"toggle-btn #{@mode == :import && "active"}"} phx-click="import_add_mode">
+        <.button
+          class={"toggle-btn #{@mode == :import && "active"}"}
+          phx-click="toggle_add_mode"
+          phx-value-mode="import"
+        >
           File Import
         </.button>
       </div>
@@ -58,23 +68,29 @@ defmodule PromptlyWeb.Components.ScriptInput do
     """
   end
 
-  defp textarea_form(assigns) do
+  defp text_editor(assigns) do
     ~H"""
     <div class={if @visible, do: "space-y-4", else: "space-y-4 hidden"}>
-      <form phx-change="update_script" phx-debounce="300">
+      <.simple_form
+        for={@script_form}
+        id="editor-form"
+        phx-change="update_script"
+        phx-debounce="300"
+        class="mb-8"
+      >
         <.input
-          type="textarea"
-          name="script"
+          field={@script_form[:content]}
+          id="editor-content"
+          type="hidden"
+          phx-hook="Trix"
           value={@script}
-          placeholder="Enter your script here..."
           class="min-h-[200px] resize-none"
-          rows="10"
-          phx-hook="MaintainFocus"
-          phx-mounted={Phoenix.LiveView.JS.focus()}
-          id="script-textarea"
         />
-      </form>
-      <.script_word_counter word_count={@word_count} script={@script} />
+        <div id="trix-editor-container" phx-update="ignore" class="mb-4">
+          <trix-editor input="editor-content" class="border rounded-button trix-editor-fixed-height"></trix-editor>
+        </div>
+      </.simple_form>
+      <.word_counter word_count={@word_count} script={@script} />
     </div>
     """
   end
@@ -224,17 +240,17 @@ defmodule PromptlyWeb.Components.ScriptInput do
     """
   end
 
-  defp script_word_counter(assigns) do
+  defp word_counter(assigns) do
     ~H"""
-    <div class={"mt-2 space-y-2 border-b pb-3 #{assigns[:class]}"}>
+    <div class={"space-y-2 border-b pb-3 #{assigns[:class]}"}>
       <div class="flex justify-between items-center text-sm">
         <span class="font-medium">Word count: {@word_count}</span>
       </div>
       <p
-        :if={!valid_character_count?(@script)}
+        :if={count_words(@script) <= 0}
         class="text-xs text-gray-500"
       >
-        Add script script to continue.
+        Enter script to continue.
       </p>
     </div>
     """
@@ -259,7 +275,6 @@ defmodule PromptlyWeb.Components.ScriptInput do
   end
 
   defp can_proceed?(assigns) do
-    trimmed_script = String.trim(assigns.script)
-    assigns.uploaded_script != "" || String.length(trimmed_script) > 0
+    assigns.uploaded_script != "" || count_words(assigns.script) > 0
   end
 end

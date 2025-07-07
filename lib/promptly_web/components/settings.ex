@@ -6,9 +6,9 @@ defmodule PromptlyWeb.Components.Settings do
 
   import PromptlyWeb.CoreComponents
 
-  attr :script, :string, required: true
-  attr :uploaded_script, :string, required: true
-  attr :settings, :map, required: true
+  attr :script, :string, default: ""
+  attr :uploaded_script, :string, default: ""
+  attr :settings, :map, default: %{}
 
   def element(assigns) do
     preview_script =
@@ -18,7 +18,7 @@ defmodule PromptlyWeb.Components.Settings do
         assigns.script
       end
 
-    assigns = assign(assigns, preview_script: preview_script)
+    assigns = assign(assigns, script: preview_script)
 
     ~H"""
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -41,7 +41,7 @@ defmodule PromptlyWeb.Components.Settings do
         <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">
           Live Preview
         </h3>
-        <.live_preview settings={@settings} script={@preview_script} />
+        <.live_preview settings={@settings} script={@script} />
       </div>
     </div>
     <div class="mt-8 flex justify-between">
@@ -305,16 +305,23 @@ defmodule PromptlyWeb.Components.Settings do
   defp live_preview(assigns) do
     ~H"""
     <div class={preview_container_class(@settings)}>
-      <div class="w-full" style={scroll_animation(@settings, @script)}>
-        <p class="p-3" style={[preview_text_style(@settings), mirror_style(@settings)]}>
-          {@script}
-        </p>
+      {Phoenix.HTML.raw("<style>#{heading_font_size(@settings)}</style>")}
+      <div class="w-full h-full" style={mirror_style(@settings)}>
+        <div
+          class="p-2 w-full trix-content"
+          style={[
+            scroll_animation(@settings, @script),
+            preview_text_style(@settings),
+          ]}
+        >
+          {Phoenix.HTML.raw(@script)}
+        </div>
       </div>
       <div
         :if={@settings.mode == :voice_controlled}
         class="absolute bottom-2 left-2 bg-green-400 bg-opacity-80 text-white text-xs px-2 py-1 rounded-button"
       >
-        🎤 Voice Controlled Mode - Speed Control Disabled
+        🎤 Voice control mode enabled
       </div>
     </div>
     <style>
@@ -399,6 +406,12 @@ defmodule PromptlyWeb.Components.Settings do
     font-size: #{size}px;
     font-family: #{css};
     line-height: 1.5;
+    """
+  end
+
+  defp heading_font_size(%{font_size: base_size}) do
+    """
+    .trix-content h1 { font-size: #{base_size * 2.0}px; }
     """
   end
 
