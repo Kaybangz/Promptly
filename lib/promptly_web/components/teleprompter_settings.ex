@@ -1,4 +1,4 @@
-defmodule PromptlyWeb.Components.Settings do
+defmodule PromptlyWeb.Components.TeleprompterSettings do
   @moduledoc """
   Renders the complete settings configuration form with live preview.
   """
@@ -21,7 +21,7 @@ defmodule PromptlyWeb.Components.Settings do
     assigns = assign(assigns, script: preview_script)
 
     ~H"""
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-b pb-4">
       <div>
         <h2 class="text-xl font-semibold text-gray-900 mb-6 border-b pb-2">
           Settings
@@ -41,9 +41,15 @@ defmodule PromptlyWeb.Components.Settings do
         <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">
           Live Preview
         </h3>
-        <.live_preview settings={@settings} script={@script} />
+        <.live_preview {assigns} />
       </div>
     </div>
+    <.navigation_buttons />
+    """
+  end
+
+  defp navigation_buttons(assigns) do
+    ~H"""
     <div class="mt-8 flex justify-between">
       <.button
         phx-click="previous_step"
@@ -95,7 +101,7 @@ defmodule PromptlyWeb.Components.Settings do
   defp speed_selection(assigns) do
     ~H"""
     <div class="setting-group">
-      <h4 class="text-sm font-bold text-gray-700 mb-2">Speed Control</h4>
+      <h4 class="text-sm font-bold text-gray-700 mb-2">Speed</h4>
       <div class={[
         "grid grid-cols-4 gap-2",
         @settings.mode == :voice_controlled && "opacity-50 pointer-events-none"
@@ -107,7 +113,7 @@ defmodule PromptlyWeb.Components.Settings do
           phx-value-speed={speed}
           disabled={@settings.mode == :voice_controlled}
           class={[
-            "px-3 py-2 text-xs rounded-button border transition-colors",
+            "px-1 py-2 text-xs rounded-button border transition-colors",
             speed == @settings.speed && "bg-primary text-white border-primary",
             speed != @settings.speed &&
               "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
@@ -303,39 +309,41 @@ defmodule PromptlyWeb.Components.Settings do
   end
 
   defp live_preview(assigns) do
+    animation_key = {
+      assigns.settings.preview_scroll_key,
+      assigns.settings.speed,
+      assigns.settings.font_size,
+      assigns.settings.font_family.css,
+      assigns.settings.mirror_mode
+    }
+
     ~H"""
     <div class={preview_container_class(@settings)}>
       {Phoenix.HTML.raw("<style>#{heading_font_size(@settings)}</style>")}
       <div class="w-full h-full" style={mirror_style(@settings)}>
         <div
           class="p-2 w-full trix-content"
-          style={[
-            scroll_animation(@settings, @script),
-            preview_text_style(@settings),
-          ]}
+          id={"scroll-content-#{elem(animation_key, 0)}"}
+          phx-update="ignore"
+          {if @settings.mode == :manual, do: %{"phx-hook" => "PreviewScrollAnimation", "data-speed" => @settings.speed, "data-animation-key" => :erlang.phash2(animation_key)}, else: %{}}
+          style={preview_text_style(@settings)}
         >
           {Phoenix.HTML.raw(@script)}
         </div>
       </div>
       <div
         :if={@settings.mode == :voice_controlled}
-        class="absolute bottom-2 left-2 bg-green-400 bg-opacity-80 text-white text-xs px-2 py-1 rounded-button"
+        class="absolute bottom-2 left-2 bg-green-400 bg-opacity-40 text-white text-xs px-2 py-1 rounded-button"
       >
         🎤 Voice control mode enabled
       </div>
     </div>
-    <style>
-      @keyframes scroll-vertical-<%= @settings.preview_scroll_key %> {
-        0% { transform: translateY(24rem); }
-        100% { transform: translateY(-100%); }
-      }
-    </style>
     """
   end
 
   defp reset_button(assigns) do
     ~H"""
-    <div class="setting-group border-t pt-4">
+    <div class="setting-group pt-3">
       <.button
         phx-click="reset_settings"
         class="w-full bg-white text-black px-4 py-2 rounded-button hover:hover:bg-gray-50 border transition-colors"
@@ -347,7 +355,7 @@ defmodule PromptlyWeb.Components.Settings do
   end
 
   defp speed_options do
-    [0.5, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0]
+    [0.5, 0.8, 1.0, 1.5, 2.0, 2.5]
   end
 
   defp font_sizes,
@@ -381,25 +389,6 @@ defmodule PromptlyWeb.Components.Settings do
   defp preview_container_class(%{theme: :dark}) do
     "relative overflow-hidden h-96 border rounded-button bg-black text-white"
   end
-
-  defp scroll_animation(
-         %{mode: :manual, preview_scroll_key: key, speed: speed, font_size: font_size},
-         script
-       ) do
-    chars_per_line = max(1, trunc(400 / (font_size * 0.6)))
-    total_lines = max(1, trunc(String.length(script) / chars_per_line))
-
-    content_height_px = total_lines * font_size * 1.5
-
-    total_distance = 384 + content_height_px
-
-    base_pixels_per_second = 100
-    duration = total_distance / (base_pixels_per_second * speed)
-
-    "animation: scroll-vertical-#{key} #{duration}s linear infinite;"
-  end
-
-  defp scroll_animation(_, _), do: ""
 
   defp preview_text_style(%{font_size: size, font_family: %{css: css}}) do
     """

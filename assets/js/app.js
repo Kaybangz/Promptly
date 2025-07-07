@@ -23,13 +23,23 @@ import "./pages/home";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
-import Trix from "./Trix";
+import Trix from "./hooks/Trix";
+import { TeleprompterControls } from "./hooks/teleprompter_controls";
+import {
+  PreviewScrollAnimation,
+  TeleprompterScrollAnimation,
+} from "./hooks/scroll_animation";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 
-let Hooks = { Trix };
+let Hooks = {
+  Trix,
+  TeleprompterControls,
+  PreviewScrollAnimation,
+  TeleprompterScrollAnimation,
+};
 
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,

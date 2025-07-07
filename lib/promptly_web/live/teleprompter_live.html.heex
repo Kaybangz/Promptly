@@ -1,6 +1,6 @@
 <Header.element
   logo={%{text: "Promptly", href: "/"}}
-  navigation={[%{text: "Go back", href: "/"}]}
+  navigation={[%{text: "Home", href: "/"}]}
 />
 <main class="py-8 w-full">
   <div>
@@ -22,10 +22,11 @@
     <section>
       <%= case @current_step do %>
         <% 1 -> %>
-          <ScriptInput.element {assigns} />
+          <ScriptUpload.element {assigns} />
         <% 2 -> %>
-          <Settings.element {assigns} />
+          <TeleprompterSettings.element {assigns} />
       <% end %>
     </section>
   </div>
 </main>
+<TeleprompterDisplay.element {assigns} />

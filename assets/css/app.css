@@ -20,3 +20,10 @@ body {
 pre {
   font-family: "Inter", sans-serif;
 }
+
+.controls-visible {
+  display: flex;
+}
+.controls-hidden {
+  display: none;
+}
