@@ -1,12 +1,12 @@
-defmodule PromptlyWeb.Components.ScriptInput do
+defmodule PromptlyWeb.Components.ScriptUpload do
   @moduledoc """
   Renders the script input component. This includes the text editor and file input element for file uploads.
   """
   use Phoenix.Component
 
   import PromptlyWeb.CoreComponents
-  import Promptly.ScriptUtils.ScriptValidation
-  import Promptly.ScriptUtils.FileProcessing
+  import Promptly.Utils.ScriptValidation
+  import Promptly.Utils.FileProcessing
 
   attr :script_mode, :atom
   attr :script, :string, default: ""
@@ -76,7 +76,7 @@ defmodule PromptlyWeb.Components.ScriptInput do
         id="editor-form"
         phx-change="update_script"
         phx-debounce="300"
-        class="mb-8"
+        class="mb-8 relative"
       >
         <.input
           field={@script_form[:content]}
@@ -89,8 +89,8 @@ defmodule PromptlyWeb.Components.ScriptInput do
         <div id="trix-editor-container" phx-update="ignore" class="mb-4">
           <trix-editor input="editor-content" class="border rounded-button trix-editor-fixed-height"></trix-editor>
         </div>
+        <.word_counter word_count={@word_count} script={@script} />
       </.simple_form>
-      <.word_counter word_count={@word_count} script={@script} />
     </div>
     """
   end
@@ -242,15 +242,15 @@ defmodule PromptlyWeb.Components.ScriptInput do
 
   defp word_counter(assigns) do
     ~H"""
-    <div class={"space-y-2 border-b pb-3 #{assigns[:class]}"}>
-      <div class="flex justify-between items-center text-sm">
-        <span class="font-medium">Word count: {@word_count}</span>
+    <div class="absolute bottom-2 right-5 bg-white bg-opacity-90 border border-gray-200 rounded px-2 py-1 text-xs text-gray-600 pointer-events-none shadow-sm">
+      <div class="flex items-center gap-1">
+        <span class="font-medium">Words: {@word_count}</span>
       </div>
       <p
         :if={count_words(@script) <= 0}
-        class="text-xs text-gray-500"
+        class="text-xs text-blue-500 mt-1"
       >
-        Enter script to continue.
+        Please enter or upload script to proceed.
       </p>
     </div>
     """

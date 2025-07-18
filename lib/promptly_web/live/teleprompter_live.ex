@@ -2,17 +2,17 @@ defmodule PromptlyWeb.TeleprompterLive do
   use PromptlyWeb, :live_view
 
   alias PromptlyWeb.Components.Header
-  alias PromptlyWeb.Components.ScriptInput
-  alias PromptlyWeb.Components.Settings
+  alias PromptlyWeb.Components.ScriptUpload
+  alias PromptlyWeb.Components.TeleprompterSettings
+  alias PromptlyWeb.Components.TeleprompterDisplay
 
-  import Promptly.ScriptUtils.FileProcessing
-  import Promptly.ScriptUtils.ScriptValidation
-
-  @total_steps 2
+  import Promptly.Utils.FileProcessing
+  import Promptly.Utils.ScriptValidation
+  import Promptly.Utils.Teleprompter
 
   @default_settings %{
     mode: :manual,
-    speed: 1.0,
+    speed: 0.8,
     font_size: 36,
     font_family: %{
       css: "Arial, sans-serif",
@@ -37,8 +37,17 @@ defmodule PromptlyWeb.TeleprompterLive do
       upload_processing: false,
       word_count: 0,
       current_step: 1,
-      total_steps: @total_steps,
-      settings: @default_settings
+      total_steps: 2,
+      settings: @default_settings,
+      show_teleprompter: false,
+      teleprompter_state: :stopped,
+      countdown_value: 0,
+      countdown_timer: nil,
+      show_controls: true,
+      scroll_key: :os.system_time(:millisecond),
+      scroll_position: 0,
+      pause_time: nil,
+      start_time: nil
     )
     |> allow_upload(
       :file,
@@ -154,7 +163,9 @@ defmodule PromptlyWeb.TeleprompterLive do
       |> assign(current_step: socket.assigns.current_step + 1)
       |> noreply()
     else
-      noreply(socket)
+      socket
+      |> start_teleprompter()
+      |> noreply()
     end
   end
 
@@ -243,6 +254,7 @@ defmodule PromptlyWeb.TeleprompterLive do
     |> noreply()
   end
 
+  @impl true
   def handle_event("update_mirror_mode", _params, socket) do
     updated_settings = %{
       socket.assigns.settings
@@ -285,11 +297,83 @@ defmodule PromptlyWeb.TeleprompterLive do
     |> noreply()
   end
 
-  defp restart_animation(socket) do
+  def handle_event("go_to_home", _params, socket) do
     socket
-    |> assign(:settings, %{
-      socket.assigns.settings
-      | preview_scroll_key: :os.system_time(:millisecond)
-    })
+    |> push_navigate(to: "/")
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("toggle_teleprompter", _params, socket) do
+    case socket.assigns.teleprompter_state do
+      :playing ->
+        socket
+        |> assign(teleprompter_state: :paused)
+        |> noreply()
+
+      :paused ->
+        socket
+        |> assign(teleprompter_state: :playing)
+        |> noreply()
+
+      _ ->
+        noreply(socket)
+    end
+  end
+
+  @impl true
+  def handle_event("toggle_voice_control", _params, socket) do
+    case socket.assigns.teleprompter_state do
+      :voice_listening ->
+        socket
+        |> assign(teleprompter_state: :stopped)
+        |> noreply()
+
+      _ ->
+        socket
+        |> assign(teleprompter_state: :voice_listening)
+        |> noreply()
+    end
+  end
+
+  def handle_event("show_controls", _params, socket) do
+    socket
+    |> assign(show_controls: true)
+    |> noreply()
+  end
+
+  def handle_event("hide_controls", _params, socket) do
+    socket
+    |> assign(show_controls: false)
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("show_teleprompter_settings", _params, socket) do
+    socket
+    |> stop_teleprompter()
+    |> noreply()
+  end
+
+  @impl true
+  def handle_info(:countdown_tick, socket) do
+    new_countdown = socket.assigns.countdown_value - 1
+
+    if new_countdown > 0 do
+      Process.send_after(self(), :countdown_tick, 1000)
+
+      socket
+      |> assign(countdown_value: new_countdown)
+      |> noreply()
+    else
+      socket
+      |> assign(
+        teleprompter_state: :playing,
+        countdown_value: 0,
+        start_time: :os.system_time(:millisecond)
+      )
+      |> restart_scroll_animation()
+      |> noreply()
+    end
   end
 end

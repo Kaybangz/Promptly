@@ -1,8 +1,4 @@
-defmodule Promptly.ScriptUtils.FileProcessing do
-  @doc """
-  Processes file content, handling empty files gracefully.
-  Returns a meaningful message for empty files.
-  """
+defmodule Promptly.Utils.FileProcessing do
   def process_content(content) when is_binary(content) do
     case String.trim(content) do
       "" -> "[File is empty or contains only whitespace]"
@@ -10,9 +6,6 @@ defmodule Promptly.ScriptUtils.FileProcessing do
     end
   end
 
-  @doc """
-  Extracts the text from DOCX file formats.
-  """
   def extract_text_from_file(%{type: :docx, path: path}) do
     try do
       charlist_path = String.to_charlist(path)
@@ -31,9 +24,6 @@ defmodule Promptly.ScriptUtils.FileProcessing do
     end
   end
 
-  @doc """
-  Extracts the text from PDF file formats.
-  """
   def extract_text_from_file(%{type: :pdf, path: path}) do
     try do
       pages = Enum.to_list(0..99)
@@ -60,9 +50,6 @@ defmodule Promptly.ScriptUtils.FileProcessing do
     end
   end
 
-  @doc """
-  Extracts the text from TXT file formats.
-  """
   def extract_text_from_file(%{type: :txt, path: path}) do
     case File.read(path) do
       {:ok, content} -> {:ok, content}
@@ -70,9 +57,6 @@ defmodule Promptly.ScriptUtils.FileProcessing do
     end
   end
 
-  @doc """
-  Gets the file extension.
-  """
   def get_file_extension(filename) do
     filename
     |> Path.extname()
@@ -80,9 +64,6 @@ defmodule Promptly.ScriptUtils.FileProcessing do
     |> String.trim_leading(".")
   end
 
-  @doc """
-  Gets the file type.
-  """
   def get_file_type(filename) do
     case get_file_extension(filename) do
       "pdf" -> :pdf
@@ -92,9 +73,6 @@ defmodule Promptly.ScriptUtils.FileProcessing do
     end
   end
 
-  @doc """
-  Converts upload error atoms to human-readable strings.
-  """
   def error_to_string(:too_large), do: "File is too large (max 10MB)"
   def error_to_string(:external_client_failure), do: "Something went terribly wrong"
 
