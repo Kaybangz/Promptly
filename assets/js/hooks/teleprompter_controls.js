@@ -9,6 +9,8 @@ export const TeleprompterControls = {
 
     this.hideControls();
 
+    this.autoHideVoiceStatus();
+
     this.handleMouseMove = (e) => {
       if (!this.isTouchDevice) {
         this.showControls();
@@ -58,10 +60,12 @@ export const TeleprompterControls = {
 
   showControls() {
     this.pushEvent("show_controls", {});
+    this.pushEvent("show_voice_status", {});
   },
 
   hideControls() {
     this.pushEvent("hide_controls", {});
+    this.pushEvent("hide_voice_status", {});
   },
 
   resetHideTimer() {
@@ -82,5 +86,13 @@ export const TeleprompterControls = {
     this.touchTimeout = setTimeout(() => {
       this.hideControls();
     }, 3000);
+  },
+
+  autoHideVoiceStatus() {
+    if (this.el.querySelector('[data-voice-listening="true"]')) {
+      setTimeout(() => {
+        this.pushEvent("hide_voice_status", {});
+      }, 3000);
+    }
   },
 };

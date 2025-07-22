@@ -15,6 +15,8 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
   attr :scroll_key, :integer, default: 0
   attr :scroll_position, :integer, default: 0
   attr :show_controls, :boolean, default: true
+  attr :show_voice_status, :boolean, default: true
+  attr :microphone_active, :boolean, default: false
 
   def element(assigns) do
     script =
@@ -34,6 +36,8 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
       phx-hook="TeleprompterControls"
       id="teleprompter-display"
     >
+      <div phx-hook="VoiceTeleprompterScrollAnimation" id="teleprompter-microphone" class="hidden">
+      </div>
       <div class={teleprompter_container_class(@settings)}>
         <.countdown_overlay
           teleprompter_state={@teleprompter_state}
@@ -53,22 +57,21 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
           settings={@settings}
         />
         <.voice_status_indicator
+          show_voice_status={@show_voice_status}
           teleprompter_state={@teleprompter_state}
+          microphone_active={@microphone_active}
           settings={@settings}
         />
       </div>
     </div>
-    <.teleprompter_styles
-      scroll_key={@scroll_key}
-      scroll_position={@scroll_position}
-    />
+    <.teleprompter_styles scroll_key={@scroll_key} scroll_position={@scroll_position} />
     """
   end
 
   defp countdown_overlay(assigns) do
     ~H"""
     <div
-      :if={@teleprompter_state == :countdown}
+      :if={@teleprompter_state == :countdown and @settings.mode == :manual}
       class="absolute inset-0 flex items-center justify-center z-20"
       style="background-color: inherit;"
     >
@@ -91,7 +94,7 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
       class="relative h-full w-full overflow-hidden"
       style={mirror_transform(@settings)}
       id="teleprompter-container"
-      phx-hook="TeleprompterScrollAnimation"
+      phx-hook="ManualTeleprompterScrollAnimation"
     >
       {Phoenix.HTML.raw("<style>#{heading_font_size(@settings)}</style>")}
       <div
@@ -115,30 +118,18 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
       controls_visibility_class(@show_controls)
     ]}>
       <.settings_button settings={@settings} />
-      <.play_pause_button
-        teleprompter_state={@teleprompter_state}
-        settings={@settings}
-      />
-      <.microphone_button
-        teleprompter_state={@teleprompter_state}
-        settings={@settings}
-      />
-      <.back_button settings={@settings} />
+      <.play_pause_button teleprompter_state={@teleprompter_state} settings={@settings} />
+      <.microphone_button teleprompter_state={@teleprompter_state} settings={@settings} />
+      <.home_button settings={@settings} />
     </div>
     """
   end
 
-  defp back_button(assigns) do
+  defp home_button(assigns) do
     ~H"""
-    <.button
-      phx-click="go_to_home"
-      class={control_button_class(@settings)}
-      title="Home"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 12l9-9 9 9v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/>
-      </svg>
-    </.button>
+    <.link href="/" class={control_button_class(@settings)} title="Home">
+      <.icon name="hero-home" class="w-5 h-5" />
+    </.link>
     """
   end
 
@@ -151,13 +142,9 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
       title={if @teleprompter_state == :playing, do: "Pause", else: "Play"}
     >
       <%= if @teleprompter_state == :playing do %>
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <.icon name="hero-pause" class="w-5 h-5" />
       <% else %>
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8 5v14l11-7z"/>
-        </svg>
+        <.icon name="hero-play" class="w-5 h-5" />
       <% end %>
     </.button>
     """
@@ -170,13 +157,18 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
       phx-click="toggle_voice_control"
       class={[
         control_button_class(@settings),
-        if(@teleprompter_state == :voice_listening, do: "bg-red-500 hover:bg-red-600", else: "")
+        if(@teleprompter_state == :voice_listening,
+          do: "bg-green-500 hover:bg-green-600 text-white animate-pulse",
+          else: ""
+        )
       ]}
-      title={if @teleprompter_state == :voice_listening, do: "Stop Listening", else: "Start Voice Control"}
+      title={
+        if @teleprompter_state == :voice_listening,
+          do: "Disable Microphone",
+          else: "Enable Microphone"
+      }
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-      </svg>
+      <.icon name="hero-microphone" class="w-5 h-5" />
     </.button>
     """
   end
@@ -188,10 +180,7 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
       class={control_button_class(@settings)}
       title="Settings"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
+      <.icon name="hero-cog-6-tooth" class="w-5 h-5" />
     </.button>
     """
   end
@@ -199,11 +188,25 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
   defp voice_status_indicator(assigns) do
     ~H"""
     <div
-      :if={@settings.mode == :voice_controlled and @teleprompter_state == :voice_listening}
-      class="absolute top-8 left-1/2 transform -translate-x-1/2 bg-red-500 bg-opacity-90 text-white px-4 py-2 rounded-full flex items-center space-x-2"
+      :if={@settings.mode == :voice_controlled}
+      class={[
+        "absolute top-8 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded-full flex items-center space-x-1",
+        if(@teleprompter_state == :voice_listening,
+          do: "bg-green-500 hover:bg-green-600",
+          else: "bg-red-500 bg-opacity-90"
+        ),
+        if(@show_voice_status, do: "opacity-100", else: "opacity-0"),
+        "transition-opacity duration-300 ease-in-out"
+      ]}
+      data-voice-listening={@teleprompter_state == :voice_listening}
     >
-      <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-      <span class="text-sm font-medium">Listening...</span>
+      <%= if @teleprompter_state == :voice_listening and @microphone_active do %>
+        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        <span class="text-sm font-medium">Listening...</span>
+      <% else %>
+        <.icon name="hero-microphone" class="w-4 h-4 animate-pulse" />
+        <span class="text-sm font-medium">Microphone Access Required</span>
+      <% end %>
     </div>
     """
   end
@@ -274,10 +277,10 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
     "flex items-center justify-center w-12 h-12 bg-gray-700 hover:bg-gray-600 text-white rounded-full transition-colors duration-200"
   end
 
-  defp teleprompter_text_style(%{font_size: size, font_family: %{css: css}}) do
+  defp teleprompter_text_style(%{font_size: size, font_family: font_family}) do
     """
     font-size: #{size}px;
-    font-family: #{css};
+    font-family: #{font_family};
     line-height: 1.6;
     text-align: left;
     padding: 0 2rem;
@@ -285,17 +288,18 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
   end
 
   defp scroll_animation(
-       %{mode: :manual, speed: speed},
-       state,
-       scroll_key,
-       scroll_position
-     ) when state in [:playing, :paused] do
-
-    animation_name = if scroll_position == 0 do
-      "scroll-teleprompter-#{scroll_key}"
-    else
-      "scroll-teleprompter-resume-#{scroll_key}"
-    end
+         %{mode: :manual, speed: speed},
+         state,
+         scroll_key,
+         scroll_position
+       )
+       when state in [:playing, :paused] do
+    animation_name =
+      if scroll_position == 0 do
+        "scroll-teleprompter-#{scroll_key}"
+      else
+        "scroll-teleprompter-resume-#{scroll_key}"
+      end
 
     play_state = if state == :paused, do: "paused", else: "running"
 
@@ -308,7 +312,11 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
     """
   end
 
-  defp scroll_animation(_, _, _, _, _), do: ""
+  defp scroll_animation(_, _, _, _) do
+    """
+    pointer-events: none;
+    """
+  end
 
   defp heading_font_size(%{font_size: base_size}) do
     """

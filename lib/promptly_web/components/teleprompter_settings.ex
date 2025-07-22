@@ -106,7 +106,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
         "grid grid-cols-4 gap-2",
         @settings.mode == :voice_controlled && "opacity-50 pointer-events-none"
       ]}>
-        <button
+        <.button
           :for={speed <- speed_options()}
           type="button"
           phx-click="update_speed"
@@ -120,7 +120,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
           ]}
         >
           {speed}x
-        </button>
+        </.button>
       </div>
     </div>
     """
@@ -131,7 +131,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
     <div class="setting-group text-">
       <h4 class="text-sm font-bold text-gray-700 mb-2">Font Size</h4>
       <div class="grid grid-cols-5 gap-2">
-        <button
+        <.button
           :for={font_size <- font_sizes()}
           type="button"
           phx-click="update_font_size"
@@ -144,7 +144,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
           ]}
         >
           {font_size.label}
-        </button>
+        </.button>
       </div>
     </div>
     """
@@ -152,69 +152,37 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
 
   defp font_family_selection(assigns) do
     ~H"""
-    <div class="mb-6 relative" phx-click-away="close_font_family_dropdown">
+    <div class="mb-6 relative">
       <h4 class="text-sm font-bold text-gray-700 mb-2">Font Family</h4>
-      <button
-        phx-click="toggle_font_family_dropdown"
-        class="bg-white border border-gray-300 text-gray-900 hover:bg-gray-50 focus:ring-2 focus:ring-primary focus:outline-none font-medium rounded-button text-sm px-4 py-2.5 text-center inline-flex items-center justify-between w-full"
-        type="button"
-      >
-        <span style={"font-family: #{@settings.font_family.css};"}>
-          {@settings.font_family.display_name}
-        </span>
-        <%= if @settings.font_family.dropdown_open do %>
-          <svg
-            class="w-4 h-4"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m18 15-6-6-6 6" />
-          </svg>
-        <% else %>
-          <svg
-            class="w-4 h-4"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        <% end %>
-      </button>
-      <div class={[
-        "absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-full mt-1 border border-gray-200",
-        if(@settings.font_family.dropdown_open, do: "block", else: "hidden")
-      ]}>
-        <ul class="py-2 text-sm text-gray-700" role="menu">
-          <li :for={{display_name, css} <- font_families()} role="none">
-            <button
-              phx-click="update_font_family"
-              phx-value-css={css}
-              phx-value-display_name={display_name}
-              class={[
-                "block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150",
-                if(@settings.font_family.css == css,
-                  do: "bg-blue-50 text-primary font-medium",
-                  else: "text-gray-700"
-                )
-              ]}
-              style={"font-family: #{css};"}
-              role="menuitem"
-            >
-              {display_name}
-            </button>
-          </li>
-        </ul>
-      </div>
+      <details class="relative w-full">
+        <summary class="bg-white border border-gray-300 text-gray-900 hover:bg-gray-50 focus:ring-2 focus:ring-primary focus:outline-none font-medium rounded-button text-sm px-4 py-2.5 text-center inline-flex items-center justify-between w-full cursor-pointer list-none">
+          <span style={"font-family: #{@settings.font_family};"}>
+            {@settings.font_family |> String.split(",") |> List.first()}
+          </span>
+          <.icon name="hero-chevron-down-solid" class="w-3 h-3" />
+        </summary>
+        <div class="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-full mt-1 border border-gray-200">
+          <ul class="py-2 text-sm text-gray-700" role="menu">
+            <li :for={font_family <- font_families()} role="none">
+              <.button
+                phx-click="update_font_family"
+                phx-value-font-family={font_family}
+                class={[
+                  "block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150",
+                  if(@settings.font_family == font_family,
+                    do: "bg-blue-50 text-primary font-medium",
+                    else: "text-gray-700"
+                  )
+                ]}
+                style={"font-family: #{font_family};"}
+                role="menuitem"
+              >
+                {font_family |> String.split(",") |> List.first()}
+              </.button>
+            </li>
+          </ul>
+        </div>
+      </details>
     </div>
     """
   end
@@ -274,17 +242,19 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
     ~H"""
     <div class="setting-group">
       <h4 class="text-sm font-bold text-gray-700 mb-2">Countdown Timer</h4>
-      <div class="flex items-center space-x-2">
-        <button
+      <div class={[
+        "flex items-center space-x-2",
+        @settings.mode == :voice_controlled && "opacity-50 pointer-events-none"
+      ]}>
+        <.button
           type="button"
           phx-click="update_countdown_timer"
           phx-value-action="decrement"
+          disabled={@settings.mode == :voice_controlled}
           class="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-button transition-colors"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-          </svg>
-        </button>
+          <.icon name="hero-minus-solid" class="w-4 h-4" />
+        </.button>
         <div class="flex items-center justify-center min-w-16 px-3 py-2 bg-gray-50 border border-gray-300 rounded-button">
           <span class="text-sm font-medium text-gray-900">
             {@settings.countdown_timer}
@@ -293,16 +263,15 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
             {if @settings.countdown_timer == 1, do: "sec", else: "secs"}
           </span>
         </div>
-        <button
+        <.button
           type="button"
           phx-click="update_countdown_timer"
           phx-value-action="increment"
+          disabled={@settings.mode == :voice_controlled}
           class="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-button transition-colors"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
+          <.icon name="hero-plus-solid" class="w-4 h-4" />
+        </.button>
       </div>
     </div>
     """
@@ -313,7 +282,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
       assigns.settings.preview_scroll_key,
       assigns.settings.speed,
       assigns.settings.font_size,
-      assigns.settings.font_family.css,
+      assigns.settings.font_family,
       assigns.settings.mirror_mode
     }
 
@@ -333,7 +302,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
       </div>
       <div
         :if={@settings.mode == :voice_controlled}
-        class="absolute bottom-2 left-2 bg-green-400 bg-opacity-40 text-white text-xs px-2 py-1 rounded-button"
+        class="absolute top-2 right-2 bg-green-400 bg-opacity-80 text-white text-xs px-2 py-1 rounded-button"
       >
         🎤 Voice control mode enabled
       </div>
@@ -360,25 +329,25 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
 
   defp font_sizes,
     do: [
-      %{label: "Small", value: 24},
-      %{label: "Medium", value: 36},
-      %{label: "Large", value: 48},
-      %{label: "Extra Large", value: 64},
-      %{label: "Huge", value: 80}
+      %{label: "Smallest", value: 24},
+      %{label: "Small", value: 36},
+      %{label: "Medium", value: 48},
+      %{label: "Large", value: 64},
+      %{label: "Largest", value: 80}
     ]
 
   defp font_families do
     [
-      {"Arial", "Arial, sans-serif"},
-      {"Helvetica", "Helvetica, sans-serif"},
-      {"Times New Roman", "Times New Roman, serif"},
-      {"Georgia", "Georgia, serif"},
-      {"Courier New", "Courier New, monospace"},
-      {"Verdana", "Verdana, sans-serif"},
-      {"Trebuchet MS", "Trebuchet MS, sans-serif"},
-      {"Comic Sans MS", "Comic Sans MS, cursive"},
-      {"Impact", "Impact, sans-serif"},
-      {"Palatino", "Palatino, serif"}
+      "Arial, sans-serif",
+      "Helvetica, sans-serif",
+      "Times New Roman, serif",
+      "Georgia, serif",
+      "Courier New, monospace",
+      "Verdana, sans-serif",
+      "Trebuchet MS, sans-serif",
+      "Comic Sans MS, cursive",
+      "Impact, sans-serif",
+      "Palatino, serif"
     ]
   end
 
@@ -390,10 +359,10 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
     "relative overflow-hidden h-96 border rounded-button bg-black text-white"
   end
 
-  defp preview_text_style(%{font_size: size, font_family: %{css: css}}) do
+  defp preview_text_style(%{font_size: size, font_family: font_family}) do
     """
     font-size: #{size}px;
-    font-family: #{css};
+    font-family: #{font_family};
     line-height: 1.5;
     """
   end

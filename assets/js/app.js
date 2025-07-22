@@ -27,7 +27,8 @@ import Trix from "./hooks/Trix";
 import { TeleprompterControls } from "./hooks/teleprompter_controls";
 import {
   PreviewScrollAnimation,
-  TeleprompterScrollAnimation,
+  ManualTeleprompterScrollAnimation,
+  VoiceTeleprompterScrollAnimation,
 } from "./hooks/scroll_animation";
 
 let csrfToken = document
@@ -38,7 +39,8 @@ let Hooks = {
   Trix,
   TeleprompterControls,
   PreviewScrollAnimation,
-  TeleprompterScrollAnimation,
+  ManualTeleprompterScrollAnimation,
+  VoiceTeleprompterScrollAnimation,
 };
 
 let liveSocket = new LiveSocket("/live", Socket, {
