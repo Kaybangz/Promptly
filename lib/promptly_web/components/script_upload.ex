@@ -35,11 +35,7 @@ defmodule PromptlyWeb.Components.ScriptUpload do
         upload_processing={@upload_processing}
         visible={@script_mode == :import}
       />
-      <.proceed_button
-        script={@script}
-        word_count={@word_count}
-        uploaded_script={@uploaded_script}
-      />
+      <.proceed_button {assigns} />
     </div>
     """
   end
@@ -87,7 +83,8 @@ defmodule PromptlyWeb.Components.ScriptUpload do
           class="min-h-[200px] resize-none"
         />
         <div id="trix-editor-container" phx-update="ignore" class="mb-4">
-          <trix-editor input="editor-content" class="border rounded-button trix-editor-fixed-height"></trix-editor>
+          <trix-editor input="editor-content" class="border rounded-button trix-editor-fixed-height">
+          </trix-editor>
         </div>
         <.word_counter word_count={@word_count} script={@script} />
       </.simple_form>
@@ -112,11 +109,7 @@ defmodule PromptlyWeb.Components.ScriptUpload do
             upload_error={@upload_error}
             script={@script}
           />
-          <.file_upload_preview
-            uploads={@uploads}
-            upload_error={@upload_error}
-            script={@script}
-          />
+          <.file_upload_preview uploads={@uploads} upload_error={@upload_error} script={@script} />
         </div>
         <.uploaded_script_preview script={@uploaded_script} />
       </form>
@@ -126,19 +119,23 @@ defmodule PromptlyWeb.Components.ScriptUpload do
 
   defp file_upload_input(assigns) do
     general_errors = upload_errors(assigns.uploads.file)
+
     entry_errors =
       assigns.uploads.file.entries
       |> Enum.flat_map(fn entry -> upload_errors(assigns.uploads.file, entry) end)
 
     has_errors = general_errors != [] or entry_errors != []
     has_valid_entries = assigns.uploads.file.entries != [] and entry_errors == []
-    has_script_conflict = String.length(String.trim(assigns.script)) > 0 && assigns.uploads.file.entries != []
 
-    assigns = assign(assigns,
-      has_errors: has_errors,
-      has_valid_entries: has_valid_entries,
-      has_script_conflict: has_script_conflict
-    )
+    has_script_conflict =
+      String.length(String.trim(assigns.script)) > 0 && assigns.uploads.file.entries != []
+
+    assigns =
+      assign(assigns,
+        has_errors: has_errors,
+        has_valid_entries: has_valid_entries,
+        has_script_conflict: has_script_conflict
+      )
 
     ~H"""
     <div class={[
@@ -246,10 +243,7 @@ defmodule PromptlyWeb.Components.ScriptUpload do
       <div class="flex items-center gap-1">
         <span class="font-medium">Words: {@word_count}</span>
       </div>
-      <p
-        :if={count_words(@script) <= 0}
-        class="text-xs text-blue-500 mt-1"
-      >
+      <p :if={count_words(@script) <= 0} class="text-xs text-blue-500 mt-1">
         Please enter or upload script to proceed.
       </p>
     </div>

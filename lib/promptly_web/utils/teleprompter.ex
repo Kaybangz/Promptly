@@ -8,7 +8,6 @@ defmodule Promptly.Utils.Teleprompter do
       :manual ->
         if socket.assigns.settings.countdown_timer > 0 do
           Process.send_after(self(), :countdown_tick, 1000)
-
           Phoenix.Component.assign(socket,
             teleprompter_state: :countdown,
             countdown_value: socket.assigns.settings.countdown_timer
@@ -22,7 +21,12 @@ defmodule Promptly.Utils.Teleprompter do
         end
 
       :voice_controlled ->
-        Phoenix.Component.assign(socket, teleprompter_state: :voice_listening)
+        Phoenix.Component.assign(socket,
+          teleprompter_state: :stopped,
+          microphone_permission: :unknown,
+          microphone_active: false,
+          microphone_error: nil
+        )
     end
   end
 
@@ -38,7 +42,9 @@ defmodule Promptly.Utils.Teleprompter do
       countdown_timer: nil,
       scroll_position: 0,
       pause_time: nil,
-      start_time: nil
+      start_time: nil,
+      microphone_active: false,
+      microphone_error: nil
     )
   end
 
@@ -53,6 +59,14 @@ defmodule Promptly.Utils.Teleprompter do
     Phoenix.Component.assign(socket,
       scroll_key: :os.system_time(:millisecond),
       scroll_position: 0
+    )
+  end
+
+  def cleanup_microphone(socket) do
+    Phoenix.Component.assign(socket,
+      microphone_active: false,
+      microphone_error: nil,
+      teleprompter_state: :stopped
     )
   end
 end

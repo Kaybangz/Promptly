@@ -14,11 +14,7 @@ defmodule PromptlyWeb.TeleprompterLive do
     mode: :manual,
     speed: 0.8,
     font_size: 36,
-    font_family: %{
-      css: "Arial, sans-serif",
-      display_name: "Arial",
-      dropdown_open: false
-    },
+    font_family: "Arial, sans-serif",
     theme: :light,
     mirror_mode: false,
     countdown_timer: 3,
@@ -44,10 +40,14 @@ defmodule PromptlyWeb.TeleprompterLive do
       countdown_value: 0,
       countdown_timer: nil,
       show_controls: true,
+      show_voice_status: true,
       scroll_key: :os.system_time(:millisecond),
       scroll_position: 0,
       pause_time: nil,
-      start_time: nil
+      start_time: nil,
+      microphone_permission: :unknown,
+      microphone_active: false,
+      microphone_error: nil
     )
     |> allow_upload(
       :file,
@@ -181,27 +181,6 @@ defmodule PromptlyWeb.TeleprompterLive do
   end
 
   @impl true
-  def handle_event("toggle_font_family_dropdown", _params, socket) do
-    current = socket.assigns.settings.font_family.dropdown_open
-    font_family = %{socket.assigns.settings.font_family | dropdown_open: !current}
-    updated_settings = %{socket.assigns.settings | font_family: font_family}
-
-    socket
-    |> assign(settings: updated_settings)
-    |> noreply()
-  end
-
-  @impl true
-  def handle_event("close_font_family_dropdown", _params, socket) do
-    font_family = %{socket.assigns.settings.font_family | dropdown_open: false}
-    updated_settings = %{socket.assigns.settings | font_family: font_family}
-
-    socket
-    |> assign(settings: updated_settings)
-    |> noreply()
-  end
-
-  @impl true
   def handle_event("update_mode", %{"mode" => mode}, socket) do
     mode = String.to_atom(mode)
     updated_settings = %{socket.assigns.settings | mode: mode}
@@ -212,8 +191,7 @@ defmodule PromptlyWeb.TeleprompterLive do
   end
 
   @impl true
-  def handle_event("update_font_family", %{"css" => css, "display_name" => display_name}, socket) do
-    font_family = %{css: css, display_name: display_name, dropdown_open: false}
+  def handle_event("update_font_family", %{"font-family" => font_family}, socket) do
     updated_settings = %{socket.assigns.settings | font_family: font_family}
 
     socket
@@ -297,12 +275,6 @@ defmodule PromptlyWeb.TeleprompterLive do
     |> noreply()
   end
 
-  def handle_event("go_to_home", _params, socket) do
-    socket
-    |> push_navigate(to: "/")
-    |> noreply()
-  end
-
   @impl true
   def handle_event("toggle_teleprompter", _params, socket) do
     case socket.assigns.teleprompter_state do
@@ -327,12 +299,19 @@ defmodule PromptlyWeb.TeleprompterLive do
       :voice_listening ->
         socket
         |> assign(teleprompter_state: :stopped)
+        |> push_event("deactivate_microphone", %{})
         |> noreply()
 
       _ ->
-        socket
-        |> assign(teleprompter_state: :voice_listening)
-        |> noreply()
+        if socket.assigns.microphone_permission == :granted and socket.assigns.microphone_active do
+          socket
+          |> assign(teleprompter_state: :voice_listening)
+          |> noreply()
+        else
+          socket
+          |> push_event("request_microphone_permission", %{})
+          |> noreply()
+        end
     end
   end
 
@@ -348,10 +327,46 @@ defmodule PromptlyWeb.TeleprompterLive do
     |> noreply()
   end
 
+  def handle_event("show_voice_status", _params, socket) do
+    socket
+    |> assign(show_voice_status: true)
+    |> noreply()
+  end
+
+  def handle_event("hide_voice_status", _params, socket) do
+    socket
+    |> assign(show_voice_status: false)
+    |> noreply()
+  end
+
   @impl true
   def handle_event("show_teleprompter_settings", _params, socket) do
     socket
     |> stop_teleprompter()
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("microphone_permission_granted", _params, socket) do
+    socket
+    |> assign(microphone_permission: :granted)
+    |> push_event("activate_microphone", %{})
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("microphone_activated", _params, socket) do
+    socket
+    |> assign(microphone_active: true)
+    |> assign(teleprompter_state: :voice_listening)
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("microphone_deactivated", _params, socket) do
+    socket
+    |> assign(microphone_active: false)
+    |> assign(teleprompter_state: :stopped)
     |> noreply()
   end
 

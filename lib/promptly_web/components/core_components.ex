@@ -275,8 +275,7 @@ defmodule PromptlyWeb.CoreComponents do
 
   attr :type, :string,
     default: "text",
-    values: ~w(checkbox color date datetime-local email file month number password
-               range search select tel text textarea time url week)
+    values: ~w(checkbox color date datetime-local email file month number password range search select tel text textarea time url week)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -410,9 +409,8 @@ defmodule PromptlyWeb.CoreComponents do
   def error(assigns) do
     ~H"""
     <p class="mt-3 flex gap-3 text-xs leading-6 text-rose-600">
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-4 w-4 flex-none" /> {render_slot(
-        @inner_block
-      )}
+      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-4 w-4 flex-none" />
+      {render_slot(@inner_block)}
     </p>
     """
   end
@@ -502,7 +500,6 @@ defmodule PromptlyWeb.CoreComponents do
                 </span>
               </div>
             </td>
-
             <td :if={@action != []} class="relative w-14 p-0">
               <div class="relative whitespace-nowrap py-4 text-right text-sm font-medium">
                 <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-zinc-50 sm:rounded-r-xl" />
