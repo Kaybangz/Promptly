@@ -1,4 +1,4 @@
-defmodule Promptly.Utils.ScriptValidation do
+defmodule PromptlyWeb.Live.Utils.ScriptValidation do
   @moduledoc false
 
   def count_words(content) when is_binary(content) do
@@ -7,7 +7,9 @@ defmodule Promptly.Utils.ScriptValidation do
     |> normalize_whitespace()
     |> String.trim()
     |> case do
-      "" -> 0
+      "" ->
+        0
+
       text ->
         text
         |> String.split(~r/\s+/)

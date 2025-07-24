@@ -1,13 +1,14 @@
-defmodule Promptly.Utils.Teleprompter do
+defmodule PromptlyWeb.Live.Utils.TeleprompterController do
   @moduledoc false
 
   def start_teleprompter(socket) do
     socket = Phoenix.Component.assign(socket, show_teleprompter: true, scroll_position: 0)
 
-    case socket.assigns.settings.mode do
+    case socket.assigns.settings.scroll_control do
       :manual ->
         if socket.assigns.settings.countdown_timer > 0 do
           Process.send_after(self(), :countdown_tick, 1000)
+
           Phoenix.Component.assign(socket,
             teleprompter_state: :countdown,
             countdown_value: socket.assigns.settings.countdown_timer
@@ -17,7 +18,7 @@ defmodule Promptly.Utils.Teleprompter do
             teleprompter_state: :playing,
             start_time: :os.system_time(:millisecond)
           )
-          |> restart_scroll_animation()
+          |> reset_scroll_position()
         end
 
       :voice_controlled ->
@@ -43,30 +44,21 @@ defmodule Promptly.Utils.Teleprompter do
       scroll_position: 0,
       pause_time: nil,
       start_time: nil,
-      microphone_active: false,
-      microphone_error: nil
+      microphone_active: false
     )
   end
 
-  def restart_animation(socket) do
+  def reset_preview_animation(socket) do
     Phoenix.Component.assign(socket, :settings, %{
       socket.assigns.settings
-      | preview_scroll_key: :os.system_time(:millisecond)
+      | preview_animation_key: :os.system_time(:millisecond)
     })
   end
 
-  def restart_scroll_animation(socket) do
+  def reset_scroll_position(socket) do
     Phoenix.Component.assign(socket,
       scroll_key: :os.system_time(:millisecond),
       scroll_position: 0
-    )
-  end
-
-  def cleanup_microphone(socket) do
-    Phoenix.Component.assign(socket,
-      microphone_active: false,
-      microphone_error: nil,
-      teleprompter_state: :stopped
     )
   end
 end

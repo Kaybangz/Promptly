@@ -1,4 +1,4 @@
-defmodule Promptly.Utils.FileProcessing do
+defmodule PromptlyWeb.Live.Utils.FileProcessing do
   def process_content(content) when is_binary(content) do
     case String.trim(content) do
       "" -> "[File is empty or contains only whitespace]"

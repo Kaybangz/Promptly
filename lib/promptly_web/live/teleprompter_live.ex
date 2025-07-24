@@ -2,30 +2,30 @@ defmodule PromptlyWeb.TeleprompterLive do
   use PromptlyWeb, :live_view
 
   alias PromptlyWeb.Components.Header
-  alias PromptlyWeb.Components.ScriptUpload
+  alias PromptlyWeb.Components.ScriptInput
   alias PromptlyWeb.Components.TeleprompterSettings
   alias PromptlyWeb.Components.TeleprompterDisplay
 
-  import Promptly.Utils.FileProcessing
-  import Promptly.Utils.ScriptValidation
-  import Promptly.Utils.Teleprompter
+  import PromptlyWeb.Live.Utils.FileProcessing
+  import PromptlyWeb.Live.Utils.ScriptValidation
+  import PromptlyWeb.Live.Utils.TeleprompterController
 
   @default_settings %{
-    mode: :manual,
+    scroll_control: :manual,
     speed: 0.8,
     font_size: 36,
     font_family: "Arial, sans-serif",
     theme: :light,
     mirror_mode: false,
     countdown_timer: 3,
-    preview_scroll_key: :os.system_time(:millisecond)
+    preview_animation_key: :os.system_time(:millisecond)
   }
 
   @impl true
   def mount(_params, _session, socket) do
     socket
     |> assign(
-      script_mode: :default,
+      script_input_mode: :default,
       script: "",
       script_form: to_form(%{}, as: :editor),
       uploaded_script: "",
@@ -46,8 +46,7 @@ defmodule PromptlyWeb.TeleprompterLive do
       pause_time: nil,
       start_time: nil,
       microphone_permission: :unknown,
-      microphone_active: false,
-      microphone_error: nil
+      microphone_active: false
     )
     |> allow_upload(
       :file,
@@ -74,7 +73,7 @@ defmodule PromptlyWeb.TeleprompterLive do
       end
 
     socket
-    |> assign(script_mode: new_mode)
+    |> assign(script_input_mode: new_mode)
     |> noreply()
   end
 
@@ -181,9 +180,9 @@ defmodule PromptlyWeb.TeleprompterLive do
   end
 
   @impl true
-  def handle_event("update_mode", %{"mode" => mode}, socket) do
-    mode = String.to_atom(mode)
-    updated_settings = %{socket.assigns.settings | mode: mode}
+  def handle_event("update_scroll_control", %{"scroll_control" => scroll_control}, socket) do
+    scroll_control = String.to_atom(scroll_control)
+    updated_settings = %{socket.assigns.settings | scroll_control: scroll_control}
 
     socket
     |> assign(settings: updated_settings)
@@ -196,7 +195,7 @@ defmodule PromptlyWeb.TeleprompterLive do
 
     socket
     |> assign(settings: updated_settings)
-    |> restart_animation()
+    |> reset_preview_animation()
     |> noreply()
   end
 
@@ -207,7 +206,7 @@ defmodule PromptlyWeb.TeleprompterLive do
 
     socket
     |> assign(settings: updated_settings)
-    |> restart_animation()
+    |> reset_preview_animation()
     |> noreply()
   end
 
@@ -218,7 +217,7 @@ defmodule PromptlyWeb.TeleprompterLive do
 
     socket
     |> assign(settings: updated_settings)
-    |> restart_animation()
+    |> reset_preview_animation()
     |> noreply()
   end
 
@@ -241,7 +240,7 @@ defmodule PromptlyWeb.TeleprompterLive do
 
     socket
     |> assign(settings: updated_settings)
-    |> restart_animation()
+    |> reset_preview_animation()
     |> noreply()
   end
 
@@ -271,7 +270,7 @@ defmodule PromptlyWeb.TeleprompterLive do
   def handle_event("reset_settings", _params, socket) do
     socket
     |> assign(settings: @default_settings)
-    |> restart_animation()
+    |> reset_preview_animation()
     |> noreply()
   end
 
@@ -387,7 +386,7 @@ defmodule PromptlyWeb.TeleprompterLive do
         countdown_value: 0,
         start_time: :os.system_time(:millisecond)
       )
-      |> restart_scroll_animation()
+      |> reset_scroll_position()
       |> noreply()
     end
   end

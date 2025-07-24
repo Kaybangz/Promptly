@@ -1,14 +1,17 @@
-defmodule PromptlyWeb.Components.ScriptUpload do
+defmodule PromptlyWeb.Components.ScriptInput do
   @moduledoc """
-  Renders the script input component. This includes the text editor and file input element for file uploads.
+  A dual-mode script input component that allows users to either type their
+  script directly in a rich text editor or upload it from supported file
+  formats.
   """
   use Phoenix.Component
 
   import PromptlyWeb.CoreComponents
-  import Promptly.Utils.ScriptValidation
-  import Promptly.Utils.FileProcessing
 
-  attr :script_mode, :atom
+  import PromptlyWeb.Live.Utils.FileProcessing
+  import PromptlyWeb.Live.Utils.ScriptValidation
+
+  attr :script_input_mode, :atom
   attr :script, :string, default: ""
   attr :script_form, :map, default: %{}
   attr :uploaded_script, :string, default: ""
@@ -20,12 +23,12 @@ defmodule PromptlyWeb.Components.ScriptUpload do
   def element(assigns) do
     ~H"""
     <div>
-      <.input_toggle mode={@script_mode} />
+      <.input_toggle mode={@script_input_mode} />
       <.text_editor
         script_form={@script_form}
         script={@script}
         word_count={@word_count}
-        visible={@script_mode == :default}
+        visible={@script_input_mode == :default}
       />
       <.file_upload_form
         uploads={@uploads}
@@ -33,7 +36,7 @@ defmodule PromptlyWeb.Components.ScriptUpload do
         uploaded_script={@uploaded_script}
         upload_error={@upload_error}
         upload_processing={@upload_processing}
-        visible={@script_mode == :import}
+        visible={@script_input_mode == :import}
       />
       <.proceed_button {assigns} />
     </div>
@@ -118,48 +121,27 @@ defmodule PromptlyWeb.Components.ScriptUpload do
   end
 
   defp file_upload_input(assigns) do
-    general_errors = upload_errors(assigns.uploads.file)
-
-    entry_errors =
-      assigns.uploads.file.entries
-      |> Enum.flat_map(fn entry -> upload_errors(assigns.uploads.file, entry) end)
-
-    has_errors = general_errors != [] or entry_errors != []
-    has_valid_entries = assigns.uploads.file.entries != [] and entry_errors == []
-
-    has_script_conflict =
-      String.length(String.trim(assigns.script)) > 0 && assigns.uploads.file.entries != []
-
-    assigns =
-      assign(assigns,
-        has_errors: has_errors,
-        has_valid_entries: has_valid_entries,
-        has_script_conflict: has_script_conflict
-      )
+    upload_state = analyze_upload_state(assigns)
+    assigns = assign(assigns, upload_state)
 
     ~H"""
-    <div class={[
-      "border transition-colors rounded-button",
-      "#{if @has_errors or @has_script_conflict,
-        do: "border-red-400",
-        else: "border-gray-300"}"
-    ]}>
+    <div class={upload_container_classes(@has_errors, @has_script_conflict)}>
       <div class="flex flex-col sm:flex-row">
         <.live_file_input
           upload={@uploads.file}
           accept=".pdf, .txt, .docx, .doc"
-          class={[
-            "flex-1 block w-full text-sm text-gray-500 file:border-none file:outline-none file:rounded-tl-[8px] sm:file:rounded-tl-[8px] sm:file:rounded-bl-[8px] sm:file:rounded-tr-none sm:file:rounded-br-none file:py-2 file:mr-2",
-            "#{if @has_errors or @has_script_conflict,
-              do: "file:text-red-600",
-              else: ""}"
-          ]}
+          class={file_input_classes(@has_errors, @has_script_conflict)}
         />
         <.button
           type="submit"
-          class="w-full sm:w-auto bg-primary text-white px-2 py-1 rounded-bl-[8px] rounded-tr-none rounded-br-[8px] sm:rounded-br-[8px] sm:rounded-tr-[8px] sm:rounded-tl-none sm:rounded-bl-none disabled:cursor-not-allowed transition-colors disabled:opacity-50"
+          class={upload_button_classes()}
           disabled={
-            not @has_valid_entries or @has_errors or @upload_processing or @has_script_conflict
+            upload_disabled?(
+              @has_valid_entries,
+              @has_errors,
+              @upload_processing,
+              @has_script_conflict
+            )
           }
         >
           Upload file
@@ -171,39 +153,62 @@ defmodule PromptlyWeb.Components.ScriptUpload do
 
   defp file_upload_preview(assigns) do
     ~H"""
-    <p class="text-xs text-gray-500 mt-1 mb-4" id="file_input_help">
-      <%= if @uploads.file.entries != [] do %>
-        <%= for entry <- @uploads.file.entries do %>
-          <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-gray-900">
-                  {entry.client_name}
-                </p>
-                <p class="text-xs text-gray-500">
-                  {Float.round(entry.client_size / 1024 / 1024, 2)} MB
-                </p>
-              </div>
-              <div class="flex items-center space-x-2">
-                <div class="w-32 bg-gray-200 rounded-full h-2">
-                  <div
-                    class="bg-primary h-2 rounded-full transition-all duration-300"
-                    style={"width: #{entry.progress}%"}
-                  >
-                  </div>
-                </div>
-                <span class="text-xs text-gray-500">
-                  {entry.progress}%
-                </span>
-              </div>
-            </div>
-            <.file_upload_errors uploads={@uploads} entry={entry} upload_error={@upload_error} />
-          </div>
-        <% end %>
+    <div class="text-xs text-gray-500 mt-1 mb-4" id="file_input_help">
+      <%= if has_file_entries?(@uploads.file) do %>
+        <div class="space-y-4">
+          <.file_entry
+            :for={entry <- @uploads.file.entries}
+            entry={entry}
+            uploads={@uploads}
+            upload_error={@upload_error}
+          />
+        </div>
       <% else %>
-        Supported formats: PDF, TXT, DOCX (max 10MB)
+        <p>Supported formats: PDF, TXT, DOCX (max 10MB)</p>
       <% end %>
-    </p>
+    </div>
+    """
+  end
+
+  defp file_entry(assigns) do
+    ~H"""
+    <div class="p-3 bg-gray-50 rounded-lg">
+      <div class="flex items-center justify-between">
+        <.file_info entry={@entry} />
+        <.progress_bar entry={@entry} />
+      </div>
+      <.file_upload_errors uploads={@uploads} entry={@entry} upload_error={@upload_error} />
+    </div>
+    """
+  end
+
+  defp file_info(assigns) do
+    ~H"""
+    <div>
+      <p class="text-sm font-medium text-gray-900">
+        {@entry.client_name}
+      </p>
+      <p class="text-xs text-gray-500">
+        {format_file_size(@entry.client_size)} MB
+      </p>
+    </div>
+    """
+  end
+
+  defp progress_bar(assigns) do
+    ~H"""
+    <div class="flex items-center space-x-2">
+      <div class="w-32 bg-gray-200 rounded-full h-2">
+        <div
+          class="bg-primary h-2 rounded-full transition-all duration-300"
+          style={"width: #{@entry.progress}%"}
+        >
+        </div>
+      </div>
+      <span class="text-xs text-gray-500">
+        {@entry.progress}%
+      </span>
+    </div>
     """
   end
 
@@ -266,6 +271,59 @@ defmodule PromptlyWeb.Components.ScriptUpload do
       </.button>
     </div>
     """
+  end
+
+  defp analyze_upload_state(assigns) do
+    file_upload = assigns.uploads.file
+    general_errors = upload_errors(file_upload)
+    entry_errors = Enum.flat_map(file_upload.entries, &upload_errors(file_upload, &1))
+
+    has_errors = general_errors != [] or entry_errors != []
+    has_valid_entries = file_upload.entries != [] and entry_errors == []
+    has_script_conflict = script_exists?(assigns.script) and file_upload.entries != []
+
+    %{
+      has_errors: has_errors,
+      has_valid_entries: has_valid_entries,
+      has_script_conflict: has_script_conflict
+    }
+  end
+
+  defp script_exists?(script) do
+    String.length(String.trim(script)) > 0
+  end
+
+  defp upload_container_classes(has_errors, has_script_conflict) do
+    base_classes = "border transition-colors rounded-button"
+
+    error_classes =
+      if has_errors or has_script_conflict, do: "border-red-400", else: "border-gray-300"
+
+    [base_classes, error_classes]
+  end
+
+  defp file_input_classes(has_errors, has_script_conflict) do
+    base_classes =
+      "flex-1 block w-full text-sm text-gray-500 file:border-none file:outline-none file:rounded-tl-[8px] sm:file:rounded-tl-[8px] sm:file:rounded-bl-[8px] sm:file:rounded-tr-none sm:file:rounded-br-none file:py-2 file:mr-2"
+
+    error_classes = if has_errors or has_script_conflict, do: "file:text-red-600", else: ""
+    [base_classes, error_classes]
+  end
+
+  defp upload_button_classes do
+    "w-full sm:w-auto bg-primary text-white px-2 py-1 rounded-bl-[8px] rounded-tr-none rounded-br-[8px] sm:rounded-br-[8px] sm:rounded-tr-[8px] sm:rounded-tl-none sm:rounded-bl-none disabled:cursor-not-allowed transition-colors disabled:opacity-50"
+  end
+
+  defp upload_disabled?(has_valid_entries, has_errors, upload_processing, has_script_conflict) do
+    not has_valid_entries or has_errors or upload_processing or has_script_conflict
+  end
+
+  defp has_file_entries?(file_upload) do
+    file_upload.entries != []
+  end
+
+  defp format_file_size(size_bytes) do
+    Float.round(size_bytes / 1024 / 1024, 2)
   end
 
   defp can_proceed?(assigns) do
