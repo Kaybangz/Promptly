@@ -9,7 +9,8 @@ defmodule Promptly.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -33,7 +34,6 @@ defmodule Promptly.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.7.21"},
-      {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
@@ -80,6 +80,15 @@ defmodule Promptly.MixProject do
         "tailwind promptly --minify",
         "esbuild promptly --minify",
         "phx.digest"
+      ]
+    ]
+  end
+
+  defp releases do
+    [
+      promptly: [
+        include_executables_for: [:unix, :windows],
+        applications: [runtime_tools: :permanent]
       ]
     ]
   end
