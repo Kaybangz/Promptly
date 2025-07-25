@@ -332,9 +332,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
     """
   end
 
-  defp speed_options do
-    [0.5, 0.8, 1.0, 1.5, 2.0, 2.5]
-  end
+  defp speed_options, do: [0.5, 0.8, 1.0, 1.5]
 
   defp font_sizes,
     do: [
@@ -345,8 +343,8 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
       %{label: "Largest", value: 80}
     ]
 
-  defp font_families do
-    [
+  defp font_families,
+    do: [
       "Arial, sans-serif",
       "Helvetica, sans-serif",
       "Times New Roman, serif",
@@ -358,7 +356,6 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
       "Impact, sans-serif",
       "Palatino, serif"
     ]
-  end
 
   defp preview_container_class(%{theme: :light}) do
     "relative overflow-hidden h-96 border rounded-button bg-white text-black"

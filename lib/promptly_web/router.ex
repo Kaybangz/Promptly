@@ -18,7 +18,7 @@ defmodule PromptlyWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/app", TeleprompterLive, :index
+    live "/teleprompter", TeleprompterLive, :index
   end
 
   # Other scopes may use custom stacks.
