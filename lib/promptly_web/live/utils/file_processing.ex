@@ -1,4 +1,10 @@
 defmodule PromptlyWeb.Live.Utils.FileProcessing do
+  @moduledoc """
+  Handles file processing utilities for extracting text from various file types
+  (DOCX, PDF, TXT) and managing file-related operations. Provides error
+  handling and type validation for file uploads in the LiveView context.
+  """
+
   def process_content(content) when is_binary(content) do
     case String.trim(content) do
       "" -> "[File is empty or contains only whitespace]"
