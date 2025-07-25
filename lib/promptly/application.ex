@@ -9,7 +9,6 @@ defmodule Promptly.Application do
   def start(_type, _args) do
     children = [
       PromptlyWeb.Telemetry,
-      Promptly.Repo,
       {DNSCluster, query: Application.get_env(:promptly, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Promptly.PubSub},
       # Start the Finch HTTP client for sending emails
