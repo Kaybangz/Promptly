@@ -1,6 +1,7 @@
 defmodule PromptlyWeb.Components.TeleprompterSettings do
   @moduledoc """
-  Renders the complete settings configuration form with live preview.
+  A comprehensive settings configuration panel with live preview for
+  customizing the teleprompter experience.
   """
   use Phoenix.Component
 
@@ -27,7 +28,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
           Settings
         </h2>
         <div class="space-y-6">
-          <.mode_selection {assigns} />
+          <.scroll_control_selection {assigns} />
           <.font_family_selection {assigns} />
           <.speed_selection {assigns} />
           <.font_size_selection {assigns} />
@@ -64,19 +65,19 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
     """
   end
 
-  defp mode_selection(assigns) do
+  defp scroll_control_selection(assigns) do
     ~H"""
     <div class="setting-group">
-      <h4 class="text-sm font-bold text-gray-700 mb-2">Mode Selection</h4>
+      <h4 class="text-sm font-bold text-gray-700 mb-2">Scroll Control</h4>
       <div class="flex space-x-4">
         <label class="flex items-center">
           <input
             type="radio"
-            name="mode"
+            name="scroll_control"
             value="manual"
-            checked={@settings.mode == :manual}
-            phx-click="update_mode"
-            phx-value-mode="manual"
+            checked={@settings.scroll_control == :manual}
+            phx-click="update_scroll_control"
+            phx-value-scroll_control="manual"
             class="mr-2"
           />
           <span class="text-sm">Manual</span>
@@ -84,14 +85,14 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
         <label class="flex items-center">
           <input
             type="radio"
-            name="mode"
+            name="scroll_control"
             value="voice_controlled"
-            checked={@settings.mode == :voice_controlled}
-            phx-click="update_mode"
-            phx-value-mode="voice_controlled"
+            checked={@settings.scroll_control == :voice_controlled}
+            phx-click="update_scroll_control"
+            phx-value-scroll_control="voice_controlled"
             class="mr-2"
           />
-          <span class="text-sm">Voice Controlled</span>
+          <span class="text-sm">Voice</span>
         </label>
       </div>
     </div>
@@ -104,14 +105,14 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
       <h4 class="text-sm font-bold text-gray-700 mb-2">Speed</h4>
       <div class={[
         "grid grid-cols-4 gap-2",
-        @settings.mode == :voice_controlled && "opacity-50 pointer-events-none"
+        @settings.scroll_control == :voice_controlled && "opacity-50 pointer-events-none"
       ]}>
         <.button
           :for={speed <- speed_options()}
           type="button"
           phx-click="update_speed"
           phx-value-speed={speed}
-          disabled={@settings.mode == :voice_controlled}
+          disabled={@settings.scroll_control == :voice_controlled}
           class={[
             "px-1 py-2 text-xs rounded-button border transition-colors",
             speed == @settings.speed && "bg-primary text-white border-primary",
@@ -244,13 +245,13 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
       <h4 class="text-sm font-bold text-gray-700 mb-2">Countdown Timer</h4>
       <div class={[
         "flex items-center space-x-2",
-        @settings.mode == :voice_controlled && "opacity-50 pointer-events-none"
+        @settings.scroll_control == :voice_controlled && "opacity-50 pointer-events-none"
       ]}>
         <.button
           type="button"
           phx-click="update_countdown_timer"
           phx-value-action="decrement"
-          disabled={@settings.mode == :voice_controlled}
+          disabled={@settings.scroll_control == :voice_controlled}
           class="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-button transition-colors"
         >
           <.icon name="hero-minus-solid" class="w-4 h-4" />
@@ -267,7 +268,7 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
           type="button"
           phx-click="update_countdown_timer"
           phx-value-action="increment"
-          disabled={@settings.mode == :voice_controlled}
+          disabled={@settings.scroll_control == :voice_controlled}
           class="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-button transition-colors"
         >
           <.icon name="hero-plus-solid" class="w-4 h-4" />
@@ -279,12 +280,14 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
 
   defp live_preview(assigns) do
     animation_key = {
-      assigns.settings.preview_scroll_key,
+      assigns.settings.preview_animation_key,
       assigns.settings.speed,
       assigns.settings.font_size,
       assigns.settings.font_family,
       assigns.settings.mirror_mode
     }
+
+    assigns = assign(assigns, animation_key: animation_key)
 
     ~H"""
     <div class={preview_container_class(@settings)}>
@@ -292,20 +295,26 @@ defmodule PromptlyWeb.Components.TeleprompterSettings do
       <div class="w-full h-full" style={mirror_style(@settings)}>
         <div
           class="p-2 w-full trix-content"
-          id={"scroll-content-#{elem(animation_key, 0)}"}
+          id={"scroll-content-#{elem(@animation_key, 0)}"}
           phx-update="ignore"
-          {if @settings.mode == :manual, do: %{"phx-hook" => "PreviewScrollAnimation", "data-speed" => @settings.speed, "data-animation-key" => :erlang.phash2(animation_key)}, else: %{}}
+          {if @settings.scroll_control == :manual, do: %{"phx-hook" => "PreviewScrollAnimation", "data-speed" => @settings.speed, "data-animation-key" => :erlang.phash2(@animation_key)}, else: %{}}
           style={preview_text_style(@settings)}
         >
-          {Phoenix.HTML.raw(@script)}
+          <pre style="white-space: pre-wrap; word-wrap: break-word; margin: 0; padding: 0; font-family: inherit; font-size: inherit; background: transparent;">{Phoenix.HTML.raw(@script)}</pre>
         </div>
       </div>
-      <div
-        :if={@settings.mode == :voice_controlled}
-        class="absolute top-2 right-2 bg-green-400 bg-opacity-80 text-white text-xs px-2 py-1 rounded-button"
-      >
-        🎤 Voice control mode enabled
-      </div>
+      <.scroll_control_status settings={@settings} />
+    </div>
+    """
+  end
+
+  defp scroll_control_status(assigns) do
+    ~H"""
+    <div
+      :if={@settings.scroll_control == :voice_controlled}
+      class="absolute top-2 right-2 bg-green-400 bg-opacity-80 text-white text-xs px-2 py-1 rounded-button"
+    >
+      🎤 Voice control mode enabled
     </div>
     """
   end

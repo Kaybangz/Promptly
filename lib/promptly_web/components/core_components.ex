@@ -78,7 +78,6 @@ defmodule PromptlyWeb.CoreComponents do
                   <.icon name="hero-x-mark-solid" class="h-5 w-5" />
                 </button>
               </div>
-
               <div id={"#{@id}-content"}>
                 {render_slot(@inner_block)}
               </div>
@@ -124,7 +123,8 @@ defmodule PromptlyWeb.CoreComponents do
     >
       <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
         <.icon :if={@kind == :info} name="hero-information-circle-mini" class="h-4 w-4" />
-        <.icon :if={@kind == :error} name="hero-exclamation-circle-mini" class="h-4 w-4" /> {@title}
+        <.icon :if={@kind == :error} name="hero-exclamation-circle-mini" class="h-4 w-4" />
+        {@title}
       </p>
       <p class="mt-2 text-sm leading-5">{msg}</p>
       <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
@@ -160,7 +160,6 @@ defmodule PromptlyWeb.CoreComponents do
         {gettext("Attempting to reconnect")}
         <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
       </.flash>
-
       <.flash
         id="server-error"
         kind={:error}
@@ -221,7 +220,7 @@ defmodule PromptlyWeb.CoreComponents do
       <.button phx-click="go" class="ml-2">Send!</.button>
   """
   attr :type, :string, default: nil
-  attr :class, :string, default: nil
+  attr :class, :any, default: nil
   attr :rest, :global, include: ~w(disabled form name value)
 
   slot :inner_block, required: true
@@ -275,7 +274,8 @@ defmodule PromptlyWeb.CoreComponents do
 
   attr :type, :string,
     default: "text",
-    values: ~w(checkbox color date datetime-local email file month number password range search select tel text textarea time url week)
+    values:
+      ~w(checkbox hidden color date datetime-local email file month number password range search select tel text textarea time url week)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -358,7 +358,9 @@ defmodule PromptlyWeb.CoreComponents do
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
-      >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
+      >
+        {Phoenix.HTML.Form.normalize_value("textarea", @value)}
+      </textarea>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """

@@ -1,67 +1,78 @@
 defmodule PromptlyWeb.Components.Header do
   @moduledoc """
-  Renders a header component.
+  Header component with responsive nav_items, logo, and call-to-action button.
+
+  ## Examples
+
+      <Header.element
+        logo={%{text: "Logo", route: "/"}}
+        nav_items={[
+          %{text: "Nav item 1", href: "#link"},
+          %{text: "Nav item 2", href: "#link"}
+        ]}
+        action={%{text: "Call to action", route: "/action"}}
+      />
   """
 
   use Phoenix.Component
 
   attr :logo, :map, required: true
-  attr :navigation, :list, default: nil
-  attr :cta, :map, default: nil
+  attr :nav_items, :list, default: nil
+  attr :action, :map, default: nil
 
   def element(assigns) do
     ~H"""
     <header class="fixed top-0 left-0 w-full bg-white z-50 shadow-sm">
       <div class="mx-auto px-4 py-4 flex items-center justify-between">
-        <.brand_logo logo={@logo} />
-        <.desktop_navigation
-          :if={@navigation}
-          navigation={@navigation}
-          cta={@cta}
-        />
-        <.mobile_menu_toggle :if={@navigation && length(@navigation) > 1} />
+        <.logo logo={@logo} />
+        <.desktop_nav :if={@nav_items} nav_items={@nav_items} action={@action} />
+        <.mobile_menu_button :if={show_mobile_menu?(@nav_items)} />
       </div>
-      <.mobile_navigation :if={@navigation && length(@navigation) > 1} navigation={@navigation} cta={@cta} />
+      <.mobile_nav
+        :if={show_mobile_menu?(@nav_items)}
+        nav_items={@nav_items}
+        action={@action}
+      />
     </header>
     """
   end
 
-  defp brand_logo(assigns) do
+  defp logo(assigns) do
     ~H"""
-    <.navigation_link class="text-2xl font-['Pacifico'] text-secondary" link={@logo} />
+    <.nav_link class="text-2xl font-['Pacifico'] text-secondary" link={@logo} />
     """
   end
 
-  defp desktop_navigation(assigns) do
+  defp desktop_nav(assigns) do
     ~H"""
     <nav class={[
       "md:flex items-center space-x-8",
-      @navigation && length(@navigation) > 1 && "hidden"
+      show_mobile_menu?(@nav_items) && "hidden"
     ]}>
-      <.navigation_link
-        :for={link <- @navigation}
+      <.nav_link
+        :for={item <- @nav_items}
         class="nav-link text-gray-700 hover:text-primary transition-colors"
-        link={link}
+        link={item}
       />
-      <.call_to_action :if={@cta} button={@cta} />
+      <.call_to_action :if={@action} button={@action} />
     </nav>
     """
   end
 
-  defp mobile_navigation(assigns) do
+  defp mobile_nav(assigns) do
     ~H"""
     <div class="md:hidden hidden bg-white border-t border-gray-200 py-2" id="mobileMenu">
       <div class="container mx-auto px-6 py-4 sm:px-6 lg:px-8">
         <nav class="flex flex-col space-y-3 py-3">
-          <.navigation_link
-            :for={link <- @navigation}
+          <.nav_link
+            :for={item <- @nav_items}
             class="text-gray-700 hover:text-primary font-medium py-2"
-            link={link}
+            link={item}
           />
-          <.navigation_link
-            :if={@cta}
+          <.nav_link
+            :if={@action}
             class="text-primary hover:text-primary-dark font-medium py-2"
-            link={@cta}
+            link={@action}
           />
         </nav>
       </div>
@@ -69,7 +80,7 @@ defmodule PromptlyWeb.Components.Header do
     """
   end
 
-  defp mobile_menu_toggle(assigns) do
+  defp mobile_menu_button(assigns) do
     ~H"""
     <button
       class="md:hidden w-10 h-10 flex items-center justify-center"
@@ -86,14 +97,14 @@ defmodule PromptlyWeb.Components.Header do
 
   defp call_to_action(assigns) do
     ~H"""
-    <.navigation_link
+    <.nav_link
       class="ml-4 px-3 py-2 bg-primary text-white font-medium rounded-button whitespace-nowrap transition-all hover:bg-opacity-90"
       link={@button}
     />
     """
   end
 
-  defp navigation_link(%{link: %{route: route}} = assigns) do
+  defp nav_link(%{link: %{route: route}} = assigns) do
     assigns = assigns |> assign(route: route)
 
     ~H"""
@@ -103,7 +114,7 @@ defmodule PromptlyWeb.Components.Header do
     """
   end
 
-  defp navigation_link(%{link: %{href: href}} = assigns) do
+  defp nav_link(%{link: %{href: href}} = assigns) do
     assigns = assigns |> assign(href: href)
 
     ~H"""
@@ -112,4 +123,7 @@ defmodule PromptlyWeb.Components.Header do
     </.link>
     """
   end
+
+  defp show_mobile_menu?(nav_items) when is_list(nav_items), do: length(nav_items) > 1
+  defp show_mobile_menu?(_), do: false
 end

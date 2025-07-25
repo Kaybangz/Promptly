@@ -1,6 +1,7 @@
 defmodule PromptlyWeb.Components.TeleprompterDisplay do
   @moduledoc """
-  Full-screen teleprompter display component with controls.
+  A full-screen teleprompter display with smooth scrolling animation and
+  interactive controls for professional script reading.
   """
   use Phoenix.Component
 
@@ -71,7 +72,7 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
   defp countdown_overlay(assigns) do
     ~H"""
     <div
-      :if={@teleprompter_state == :countdown and @settings.mode == :manual}
+      :if={@teleprompter_state == :countdown and @settings.scroll_control == :manual}
       class="absolute inset-0 flex items-center justify-center z-20"
       style="background-color: inherit;"
     >
@@ -105,7 +106,7 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
           scroll_animation(@settings, @teleprompter_state, @scroll_key, @scroll_position)
         ]}
       >
-        {Phoenix.HTML.raw(@script)}
+        <pre style="white-space: pre-wrap; word-wrap: break-word; margin: 0; padding: 0; font-family: inherit; font-size: inherit; background: transparent;">{Phoenix.HTML.raw(@script)}</pre>
       </div>
     </div>
     """
@@ -136,7 +137,7 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
   defp play_pause_button(assigns) do
     ~H"""
     <.button
-      :if={@settings.mode == :manual}
+      :if={@settings.scroll_control == :manual}
       phx-click="toggle_teleprompter"
       class={control_button_class(@settings)}
       title={if @teleprompter_state == :playing, do: "Pause", else: "Play"}
@@ -153,7 +154,7 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
   defp microphone_button(assigns) do
     ~H"""
     <.button
-      :if={@settings.mode == :voice_controlled}
+      :if={@settings.scroll_control == :voice_controlled}
       phx-click="toggle_voice_control"
       class={[
         control_button_class(@settings),
@@ -188,7 +189,7 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
   defp voice_status_indicator(assigns) do
     ~H"""
     <div
-      :if={@settings.mode == :voice_controlled}
+      :if={@settings.scroll_control == :voice_controlled}
       class={[
         "absolute top-8 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded-full flex items-center space-x-1",
         if(@teleprompter_state == :voice_listening,
@@ -288,7 +289,7 @@ defmodule PromptlyWeb.Components.TeleprompterDisplay do
   end
 
   defp scroll_animation(
-         %{mode: :manual, speed: speed},
+         %{scroll_control: :manual, speed: speed},
          state,
          scroll_key,
          scroll_position

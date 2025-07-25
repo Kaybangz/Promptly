@@ -4,9 +4,9 @@
 
 /* This file is for your main application CSS */
 
-@import url("./pages/home.css");
-@import url("./pages/script_upload.css");
-@import url("./Trix.css");
+@import url("./home.css");
+@import url("./script_input.css");
+@import url("./trix.css");
 
 @import url("https://fonts.googleapis.com");
 @import url("https://fonts.gstatic.com");

@@ -7,9 +7,13 @@ export const TeleprompterControls = {
     this.isTouchDevice =
       "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-    this.hideControls();
+    setTimeout(() => {
+      this.hideControls();
+    }, 5000);
 
-    this.autoHideVoiceStatus();
+    setTimeout(() => {
+      this.autoHideVoiceStatus();
+    }, 5000);
 
     this.handleMouseMove = (e) => {
       if (!this.isTouchDevice) {
