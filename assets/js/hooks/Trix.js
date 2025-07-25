@@ -8,7 +8,6 @@ export default {
       this.el.dispatchEvent(new Event("change", { bubbles: true }));
     });
 
-    // Handles behavior when inserting a file
     element.editor.element.addEventListener(
       "trix-attachment-add",
       function (event) {
@@ -16,7 +15,6 @@ export default {
       }
     );
 
-    // Handle behavior when deleting a file
     element.editor.element.addEventListener(
       "trix-attachment-remove",
       function (event) {
