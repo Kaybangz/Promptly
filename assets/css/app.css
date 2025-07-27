@@ -5,7 +5,9 @@
 /* This file is for your main application CSS */
 
 @import url("./home.html.css");
+@import url("./home.html.css");
 @import url("./script_input.css");
+@import url("./Trix.css");
 @import url("./Trix.css");
 
 @import url("https://fonts.googleapis.com");
@@ -14,9 +16,11 @@
 
 body {
   font-family: "Rubik", sans-serif;
+  font-family: "Rubik", sans-serif;
   color: #1a202c;
 }
 
 pre {
+  font-family: "Rubik", sans-serif;
   font-family: "Rubik", sans-serif;
 }
