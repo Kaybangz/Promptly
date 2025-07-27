@@ -10,7 +10,7 @@ defmodule PromptlyWeb.TeleprompterLive do
   import PromptlyWeb.Live.Utils.ScriptValidation
   import PromptlyWeb.Live.Utils.TeleprompterController
 
-  @default_settings %{
+  @teleprompter_default_settings %{
     scroll_control: :manual,
     speed: 0.8,
     font_size: 36,
@@ -34,7 +34,7 @@ defmodule PromptlyWeb.TeleprompterLive do
       word_count: 0,
       current_step: 1,
       total_steps: 2,
-      settings: @default_settings,
+      settings: @teleprompter_default_settings,
       show_teleprompter: false,
       teleprompter_state: :stopped,
       countdown_value: 0,
@@ -58,7 +58,7 @@ defmodule PromptlyWeb.TeleprompterLive do
   end
 
   @impl true
-  def handle_event("toggle_add_mode", %{"mode" => mode}, socket) do
+  def handle_event("toggle_script_input_mode", %{"mode" => mode}, socket) do
     new_mode = String.to_existing_atom(mode)
 
     socket =
@@ -269,7 +269,7 @@ defmodule PromptlyWeb.TeleprompterLive do
   @impl true
   def handle_event("reset_settings", _params, socket) do
     socket
-    |> assign(settings: @default_settings)
+    |> assign(settings: @teleprompter_default_settings)
     |> reset_preview_animation()
     |> noreply()
   end

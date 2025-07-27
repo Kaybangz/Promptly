@@ -372,8 +372,11 @@ export const VoiceTeleprompterScrollAnimation = {
       `.teleprompter-word[data-index="${index}"]`
     );
     if (currentSpan) {
-      currentSpan.style.backgroundColor = "teal";
-      currentSpan.style.color = "white";
+      currentSpan.style.background =
+        "linear-gradient(135deg, #0891b2, #06b6d4, #22d3ee)";
+      currentSpan.style.webkitBackgroundClip = "text";
+      currentSpan.style.backgroundClip = "text";
+      currentSpan.style.color = "transparent";
     }
   },
 

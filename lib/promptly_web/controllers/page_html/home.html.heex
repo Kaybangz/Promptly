@@ -1,5 +1,4 @@
 <Header.element
-  logo={%{text: "Promptly", href: "/"}}
   nav_items={[
     %{text: "Features", href: "#features"},
     %{text: "How It Works", href: "#how-it-works"}
@@ -11,11 +10,11 @@
       <div class="text-center md:text-left">
         <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
           Your Voice, Pace, and
-          <span class="bg-gradient-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">
+          <span class="bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent">
             Perfect Performance
           </span>
         </h1>
-        <p class="text-lg md:text-xl text-gray-100 mb-8">
+        <p class="text-md md:text-lg text-gray-100 mb-8">
           Empowers you to deliver your flawless presentations, videos, and speeches with ease and confidence.
         </p>
         <div class="flex flex-col justify-center mb-5 sm:flex-row md:justify-start md:mb-0 gap-4">
@@ -34,9 +33,9 @@
         </div>
       </div>
       <div class="relative flex justify-center md:justify-end">
-        <div class="w-[900px] h-[400px] rounded-3xl shadow-xl overflow-hidden border-8 border-gray-800 relative blur-container">
+        <div class="w-[800px] h-[400px] rounded-xl shadow-lg overflow-hidden border-8 border-gray-800 relative blur-container">
           <div class="absolute inset-0 flex flex-col items-center justify-center text-white p-6 bg-black bg-opacity-50 scroll-container">
-            <div class="container animate-scroll space-y-4 text-center opacity-70 scroll-content blur-mask">
+            <div class="container text-md md:text-lg animate-scroll px-2 space-y-4 opacity-70 scroll-content blur-mask">
               Two roads diverged in a yellow wood,
               And sorry I could not travel both
               And be one traveler, long I stood
@@ -64,13 +63,13 @@
     </div>
   </div>
 </section>
-<section id="features" class="py-20 bg-gray-50">
+<section id="features" class="py-16 md:py-20 bg-gray-50">
   <div class="container mx-auto px-6">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-secondary mb-4">
-        Powerful Features for Seamless Reading
+    <div class="text-center mb-14 md:mb-16">
+      <h2 class="text-2xl md:text-3xl font-bold text-secondary mb-4">
+        Features
       </h2>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+      <p class="text-md md:text-lg text-gray-600 max-w-2xl mx-auto">
         Everything you need to deliver flawless presentations, speeches, and content with confidence.
       </p>
     </div>
@@ -79,10 +78,10 @@
         <div class="w-16 h-16 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mb-6 mx-auto">
           <.icon name="hero-microphone" class="w-6 h-6 text-primary" />
         </div>
-        <h3 class="text-xl font-semibold text-secondary mb-3 text-center">
+        <h3 class="text-lg md:text-xl font-semibold text-secondary mb-3 text-center">
           Voice Control
         </h3>
-        <p class="text-gray-600 text-center">
+        <p class="text-gray-600 text-center text-sm md:text-md">
           Speak naturally and let the teleprompter scroll automatically at your pace. No manual controls needed.
         </p>
       </div>
@@ -90,10 +89,10 @@
         <div class="w-16 h-16 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mb-6 mx-auto">
           <.icon name="hero-document-arrow-up" class="w-6 h-6 text-primary" />
         </div>
-        <h3 class="text-xl font-semibold text-secondary mb-3 text-center">
+        <h3 class="text-lg md:text-xl font-semibold text-secondary mb-3 text-center">
           File Import
         </h3>
-        <p class="text-gray-600 text-center">
+        <p class="text-gray-600 text-center text-sm md:text-md">
           PDF, DOCX, TXT - we handle it all. Import your scripts from any format and start reading instantly.
         </p>
       </div>
@@ -101,23 +100,23 @@
         <div class="w-16 h-16 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mb-6 mx-auto">
           <.icon name="hero-cog-6-tooth" class="w-6 h-6 text-primary" />
         </div>
-        <h3 class="text-xl font-semibold text-secondary mb-3 text-center">
+        <h3 class="text-lg md:text-xl font-semibold text-secondary mb-3 text-center">
           Customizable
         </h3>
-        <p class="text-gray-600 text-center">
+        <p class="text-gray-600 text-center text-sm md:text-md">
           Fonts, themes, and speed - your way. Customize every aspect of your teleprompter experience to suit your needs.
         </p>
       </div>
     </div>
   </div>
 </section>
-<section id="how-it-works" class="py-20 bg-white">
+<section id="how-it-works" class="py-16 md:py-20 bg-white">
   <div class="container mx-auto px-6">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-secondary mb-4">
+    <div class="text-center mb-14 md:mb-16">
+      <h2 class="text-2xl md:text-3xl font-bold text-secondary mb-4">
         How It Works
       </h2>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+      <p class="text-md md:text-lg text-gray-600 max-w-2xl mx-auto">
         Get started in just three simple steps and transform your presentation experience.
       </p>
     </div>
@@ -130,10 +129,10 @@
           <div class="w-16 h-16 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mb-6 mx-auto">
             <.icon name="hero-document-text" class="w-6 h-6 text-primary" />
           </div>
-          <h3 class="text-xl font-semibold text-secondary mb-3 text-center">
+          <h3 class="text-lg md:text-xl font-semibold text-secondary mb-3 text-center">
             Import or Paste
           </h3>
-          <p class="text-gray-600 text-center">
+          <p class="text-gray-600 text-center text-sm md:text-md">
             Upload your script file or simply paste your text into the editor.
           </p>
         </div>
@@ -146,10 +145,10 @@
           <div class="w-16 h-16 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mb-6 mx-auto">
             <.icon name="hero-adjustments-horizontal" class="w-6 h-6 text-primary" />
           </div>
-          <h3 class="text-xl font-semibold text-secondary mb-3 text-center">
+          <h3 class="text-lg md:text-xl font-semibold text-secondary mb-3 text-center">
             Configure
           </h3>
-          <p class="text-gray-600 text-center">
+          <p class="text-gray-600 text-center text-sm md:text-md">
             Adjust font size, speed, and enable voice control to match your preferences.
           </p>
         </div>
@@ -162,10 +161,10 @@
           <div class="w-16 h-16 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mb-6 mx-auto">
             <.icon name="hero-play-circle" class="w-6 h-6 text-primary" />
           </div>
-          <h3 class="text-xl font-semibold text-secondary mb-3 text-center">
+          <h3 class="text-lg md:text-xl font-semibold text-secondary mb-3 text-center">
             Start Presenting
           </h3>
-          <p class="text-gray-600 text-center">
+          <p class="text-gray-600 text-center text-sm md:text-md">
             Begin your presentation and let your voice guide the flow automatically.
           </p>
         </div>
@@ -173,13 +172,13 @@
     </div>
   </div>
 </section>
-<section class="py-20 bg-gray-50">
+<section class="py-16 md:py-20 bg-gray-50">
   <div class="container mx-auto px-6">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-secondary mb-4">
+    <div class="text-center mb-14 md:mb-16">
+      <h2 class="text-2xl md:text-3xl font-bold text-secondary mb-4">
         What Our Users Say
       </h2>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+      <p class="text-md md:text-lg text-gray-600 max-w-2xl mx-auto">
         Join thousands of content creators who have transformed their
         presentations with Promptly.
       </p>
@@ -193,18 +192,18 @@
           <i class="ri-star-fill"></i>
           <i class="ri-star-half"></i>
         </div>
-        <p class="text-gray-600 mb-6">
+        <p class="text-gray-600 mb-6 text-sm md:text-md">
           "Promptly has completely changed how I create YouTube videos. The
           voice control feature is a game-changer - I can focus on my
           delivery instead of worrying about scrolling."
         </p>
         <div class="flex items-center">
-          <div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mr-4">
-            <.icon name="hero-user" class="w-5 h-5 text-primary" />
+          <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mr-4">
+            <.icon name="hero-user" class="w-4 h-4 md:w-5 md:h-5 text-primary" />
           </div>
           <div>
-            <h4 class="font-medium text-secondary">Michael Thompson</h4>
-            <p class="text-sm text-gray-500">Content Creator</p>
+            <h4 class="font-medium text-secondary text-sm md:text-md">Michael Thompson</h4>
+            <p class="text-xs md:text-sm text-gray-500">Content Creator</p>
           </div>
         </div>
       </div>
@@ -216,18 +215,18 @@
           <i class="ri-star-fill"></i>
           <i class="ri-star-fill"></i>
         </div>
-        <p class="text-gray-600 mb-6">
+        <p class="text-gray-600 mb-6 text-sm md:text-md">
           "As a public speaking coach, I recommend Promptly to all my
           clients. The customization options are extensive, and the
           interface is intuitive."
         </p>
         <div class="flex items-center">
-          <div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mr-4">
-            <.icon name="hero-user" class="w-5 h-5 text-primary" />
+          <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mr-4">
+            <.icon name="hero-user" class="w-4 h-4 md:w-5 md:h-5 text-primary" />
           </div>
           <div>
-            <h4 class="font-medium text-secondary">Samantha Williams</h4>
-            <p class="text-sm text-gray-500">Public Speaking Coach</p>
+            <h4 class="font-medium text-secondary text-sm md:text-md">Samantha Williams</h4>
+            <p class="text-xs md:text-sm text-gray-500">Public Speaking Coach</p>
           </div>
         </div>
       </div>
@@ -239,18 +238,18 @@
           <i class="ri-star-fill"></i>
           <i class="ri-star-fill"></i>
         </div>
-        <p class="text-gray-600 mb-6">
+        <p class="text-gray-600 mb-6 text-sm md:text-md">
           "I use Promptly for all my corporate presentations. The ability to
           import various file formats and adjust the reading speed on the
           fly has made my presentations much more polished."
         </p>
         <div class="flex items-center">
-          <div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mr-4">
-            <.icon name="hero-user" class="w-5 h-5 text-primary" />
+          <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-primary bg-opacity-10 !rounded-full mr-4">
+            <.icon name="hero-user" class="w-4 h-4 md:w-5 md:h-5 text-primary" />
           </div>
           <div>
-            <h4 class="font-medium text-secondary">David Rodriguez</h4>
-            <p class="text-sm text-gray-500">Marketing Director</p>
+            <h4 class="font-medium text-secondary text-sm md:text-md">David Rodriguez</h4>
+            <p class="text-xs md:text-sm text-gray-500">Marketing Director</p>
           </div>
         </div>
       </div>
@@ -259,7 +258,7 @@
 </section>
 <section class="py-20 cta-gradient">
   <div class="container mx-auto px-6 text-center">
-    <h2 class="text-2xl md:text-4xl font-bold text-white mb-6">
+    <h2 class="text-2xl md:text-3xl font-bold text-white mb-6">
       Ready to transform your presentations?
     </h2>
     <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -270,13 +269,13 @@
         Try Promptly Free
       </.link>
     </div>
-    <p class="text-gray-400">No payments required. Completely free.</p>
+    <p class="text-gray-400 text-sm md:text-md">No payments required. Completely free.</p>
   </div>
 </section>
 <footer class="bg-secondary text-white py-12">
   <div class="container mx-auto px-6 text-center">
     <a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">Promptly</a>
-    <p class="text-gray-400">
+    <p class="text-gray-400 text-sm md:text-md">
       © {DateTime.utc_now().year} Promptly. All rights reserved.
     </p>
   </div>

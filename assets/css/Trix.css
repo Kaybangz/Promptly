@@ -34,20 +34,19 @@
 }
 
 .trix-content blockquote {
-  border-left: 4px solid #e5e7eb;
+  border-left: 4px solid #d4d6da;
   padding-left: 1rem;
   margin: 1rem 0;
   font-style: italic;
-  background-color: #f9fafb;
   padding: 1rem;
   border-radius: 0.375rem;
 }
 
 .trix-content code {
   background-color: #f3f4f6;
+  color: black;
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
-  color: #dc2626;
 }
 
 .trix-content pre {
