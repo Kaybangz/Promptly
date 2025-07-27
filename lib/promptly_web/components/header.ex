@@ -5,7 +5,6 @@ defmodule PromptlyWeb.Components.Header do
   ## Examples
 
       <Header.element
-        logo={%{text: "Logo", route: "/"}}
         nav_items={[
           %{text: "Nav item 1", href: "#link"},
           %{text: "Nav item 2", href: "#link"}
@@ -38,7 +37,7 @@ defmodule PromptlyWeb.Components.Header do
 
   defp logo(assigns) do
     ~H"""
-    <.link navigate={"/"} class="text-2xl font-['Pacifico'] text-secondary">
+    <.link href="/" class="text-2xl font-['Pacifico'] text-secondary">
       Promptly
     </.link>
     """
