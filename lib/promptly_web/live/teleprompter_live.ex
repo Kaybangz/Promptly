@@ -151,7 +151,6 @@ defmodule PromptlyWeb.TeleprompterLive do
   def handle_event("clear_file", _params, socket) do
     socket
     |> assign(uploaded_script: "")
-    |> assign(upload_error: nil)
     |> noreply()
   end
 
