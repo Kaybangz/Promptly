@@ -1,6 +1,6 @@
 defmodule PromptlyWeb.Components.Header do
   @moduledoc """
-  Header component with responsive nav_items, logo, and call-to-action button.
+  Header component with responsive navigation and call-to-action button.
 
   ## Examples
 

@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="relative flex justify-center md:justify-end">
-        <div class="w-[800px] h-[400px] rounded-xl shadow-lg overflow-hidden border-8 border-gray-800 relative blur-container">
+        <div class="w-full max-w-[700px] h-[350px] sm:w-[600px] md:w-[700px] rounded-xl shadow-lg overflow-hidden border-8 border-gray-800 relative blur-container">
           <div class="absolute inset-0 flex flex-col items-center justify-center text-white p-6 bg-black bg-opacity-50 scroll-container">
             <div class="container text-md md:text-lg animate-scroll px-2 space-y-4 opacity-70 scroll-content blur-mask">
               Two roads diverged in a yellow wood,
@@ -185,7 +185,7 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <div class="bg-white p-8 !rounded-xl shadow-md">
-        <div class="flex items-center gap-1 text-yellow-400 mb-4">
+        <div class="flex items-center gap-1 text-yellow-400 mb-4" aria-label="4.5 out of 5 stars">
           <i class="ri-star-fill"></i>
           <i class="ri-star-fill"></i>
           <i class="ri-star-fill"></i>
@@ -208,7 +208,7 @@
         </div>
       </div>
       <div class="bg-white p-8 !rounded-xl shadow-md">
-        <div class="flex items-center gap-1 text-yellow-400 mb-4">
+        <div class="flex items-center gap-1 text-yellow-400 mb-4" aria-label="5 out of 5 stars">
           <i class="ri-star-fill"></i>
           <i class="ri-star-fill"></i>
           <i class="ri-star-fill"></i>
@@ -231,7 +231,7 @@
         </div>
       </div>
       <div class="bg-white p-8 !rounded-xl shadow-md">
-        <div class="flex items-center gap-1 text-yellow-400 mb-4">
+        <div class="flex items-center gap-1 text-yellow-400 mb-4" aria-label="5 out of 5 stars">
           <i class="ri-star-fill"></i>
           <i class="ri-star-fill"></i>
           <i class="ri-star-fill"></i>
@@ -276,7 +276,7 @@
   <div class="container mx-auto px-6 text-center">
     <a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">Promptly</a>
     <p class="text-gray-400 text-sm md:text-md">
-      © {DateTime.utc_now().year} Promptly. All rights reserved.
+      © <%= DateTime.utc_now().year %> Promptly. All rights reserved.
     </p>
   </div>
 </footer>
