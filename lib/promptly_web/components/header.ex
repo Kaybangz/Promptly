@@ -5,7 +5,6 @@ defmodule PromptlyWeb.Components.Header do
   ## Examples
 
       <Header.element
-        logo={%{text: "Logo", route: "/"}}
         nav_items={[
           %{text: "Nav item 1", href: "#link"},
           %{text: "Nav item 2", href: "#link"}
@@ -16,7 +15,6 @@ defmodule PromptlyWeb.Components.Header do
 
   use Phoenix.Component
 
-  attr :logo, :map, required: true
   attr :nav_items, :list, default: nil
   attr :action, :map, default: nil
 
@@ -24,7 +22,7 @@ defmodule PromptlyWeb.Components.Header do
     ~H"""
     <header class="fixed top-0 left-0 w-full bg-white z-50 shadow-sm">
       <div class="mx-auto px-4 py-4 flex items-center justify-between">
-        <.logo logo={@logo} />
+        <.logo />
         <.desktop_nav :if={@nav_items} nav_items={@nav_items} action={@action} />
         <.mobile_menu_button :if={show_mobile_menu?(@nav_items)} />
       </div>
@@ -39,7 +37,9 @@ defmodule PromptlyWeb.Components.Header do
 
   defp logo(assigns) do
     ~H"""
-    <.nav_link class="text-2xl font-['Pacifico'] text-secondary" link={@logo} />
+    <.link href="/" class="text-2xl font-['Pacifico'] text-secondary">
+      Promptly
+    </.link>
     """
   end
 
@@ -62,11 +62,11 @@ defmodule PromptlyWeb.Components.Header do
   defp mobile_nav(assigns) do
     ~H"""
     <div class="md:hidden hidden bg-white border-t border-gray-200 py-2" id="mobileMenu">
-      <div class="container mx-auto px-6 py-4 sm:px-6 lg:px-8">
+      <div class="mx-auto px-4 py-4 sm:px-6 lg:px-8">
         <nav class="flex flex-col space-y-3 py-3">
           <.nav_link
             :for={item <- @nav_items}
-            class="text-gray-700 hover:text-primary font-medium py-2"
+            class="text-sm md:text-md text-gray-700 hover:text-primary font-medium py-2"
             link={item}
           />
           <.nav_link
@@ -83,13 +83,13 @@ defmodule PromptlyWeb.Components.Header do
   defp mobile_menu_button(assigns) do
     ~H"""
     <button
-      class="md:hidden w-10 h-10 flex items-center justify-center"
+      class="md:hidden w-8 h-8 flex items-center justify-center"
       id="mobileMenuButton"
       aria-label="Toggle mobile menu"
     >
-      <div class="w-6 h-6 flex items-center justify-center">
-        <i class="ri-menu-3-line text-black text-2xl" id="menuIcon"></i>
-        <i class="ri-close-large-line text-black text-2xl hidden" id="closeIcon"></i>
+      <div class="w-5 h-5 flex items-center justify-center">
+        <i class="ri-menu-3-line text-black text-xl" id="menuIcon"></i>
+        <i class="ri-close-large-line text-black text-xl hidden" id="closeIcon"></i>
       </div>
     </button>
     """

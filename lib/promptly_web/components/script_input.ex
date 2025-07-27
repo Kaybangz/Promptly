@@ -50,14 +50,14 @@ defmodule PromptlyWeb.Components.ScriptInput do
       <div class="toggle-buttons">
         <.button
           class={"toggle-btn #{@mode == :default && "active"}"}
-          phx-click="toggle_add_mode"
+          phx-click="toggle_script_input_mode"
           phx-value-mode="default"
         >
           Text Editor
         </.button>
         <.button
           class={"toggle-btn #{@mode == :import && "active"}"}
-          phx-click="toggle_add_mode"
+          phx-click="toggle_script_input_mode"
           phx-value-mode="import"
         >
           File Import
@@ -234,7 +234,7 @@ defmodule PromptlyWeb.Components.ScriptInput do
           Word count: {count_words(@script)}
         </div>
         <div class="-mt-3 flex items-center gap-1">
-          <.button phx-click="clear_file">Clear</.button>
+          <.button type="button" phx-click="clear_file">Clear</.button>
         </div>
       </div>
       <pre class="overflow-auto h-72 max-h-72 whitespace-pre-wrap break-words text-sm text-gray-700 leading-relaxed tracking-wide"><%= @script %></pre>

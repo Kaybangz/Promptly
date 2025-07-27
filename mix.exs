@@ -57,7 +57,6 @@ defmodule Promptly.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:pdf_extractor, "~> 0.2.1"},
-      {:pythonx, "~> 0.4.4"},
       {:docxelixir, "~> 1.0"}
     ]
   end
