@@ -33,7 +33,8 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("RENDER_EXTERNAL_HOSTNAME") || "localhost"
+  # Updated for Gigalixir
+  host = System.get_env("APP_NAME") <> ".gigalixirapp.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :promptly, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
@@ -47,6 +48,10 @@ if config_env() == :prod do
       # for details about using IPv6 vs IPv4 and loopback vs public addresses.
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
+    ],
+    check_origin: [
+      "https://" <> host,
+      "//" <> host
     ],
     secret_key_base: secret_key_base
 
