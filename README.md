@@ -4,7 +4,7 @@
 ![Elixir](https://img.shields.io/badge/Elixir-1.15+-purple.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-A modern teleprompter application, with voice control support. Built with Phoenix LiveView with support for real-time responsiveness and featuring advanced speech recognition capabilities.
+A modern teleprompter application, with voice control support. Built with Phoenix LiveView with support for real-time responsiveness and featuring speech recognition capabilities.
 
 ## Features
 
@@ -56,9 +56,7 @@ Visit [`localhost:4000`](http://localhost:4000) to access the application.
 
 ## Usage
 
-### Basic Usage
-
-1. **Create a Script**: Either write/paste text directly to the editor or upload a file
+1. **Enter a Script**: Either write/paste text directly to the editor or upload a file
 2. **Configure Settings**: Adjust scroll speed, text size, theme, or mirror mode
 3. **Start Reading**: Click "Start" and start presenting
 4. **Automatic Sync**: When scroll control is set to voice, the app will highlight current words and scroll automatically

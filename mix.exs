@@ -33,7 +33,6 @@ defmodule Promptly.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.7.21"},
-      {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
@@ -57,7 +56,6 @@ defmodule Promptly.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:pdf_extractor, "~> 0.2.1"},
-      {:pythonx, "~> 0.4.4"},
       {:docxelixir, "~> 1.0"}
     ]
   end
