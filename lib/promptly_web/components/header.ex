@@ -62,7 +62,7 @@ defmodule PromptlyWeb.Components.Header do
   defp mobile_nav(assigns) do
     ~H"""
     <div class="md:hidden hidden bg-white border-t border-gray-200 py-2" id="mobileMenu">
-      <div class="mx-auto px-6 py-4 sm:px-6 lg:px-8">
+      <div class="mx-auto px-4 py-4 sm:px-6 lg:px-8">
         <nav class="flex flex-col space-y-3 py-3">
           <.nav_link
             :for={item <- @nav_items}
